@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>병상현황 - 정신병원입원 의뢰 시스템</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1f2937;
+            line-height: 1.5;
+        }
+
+        /* 헤더 */
+        .header {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 16px 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .system-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1B365D;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-info {
+            font-size: 14px;
+            color: #374151;
+        }
+
+        .logout-button {
+            background: none;
+            border: 1px solid #e5e7eb;
+            color: #6B7280;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logout-button:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+
+        /* 메인 컨테이너 */
+        .main-container {
+            margin-top: 70px;
+            margin-bottom: 80px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 20px;
+        }
+
+        /* 필터 영역 */
+        .filter-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .filter-toggle {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            background: #e5e7eb;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .toggle-switch.active {
+            background: #2563EB;
+        }
+
+        .toggle-handle {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.2s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch.active .toggle-handle {
+            transform: translateX(24px);
+        }
+
+        .filter-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        /* 병원 목록 */
+        .hospital-list {
+            display: grid;
+            gap: 16px;
+        }
+
+        .hospital-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .hospital-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .hospital-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .hospital-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .night-badge {
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .night-badge.available {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .night-badge.unavailable {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .hospital-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        .phone-link {
+            color: #2563EB;
+            text-decoration: none;
+        }
+
+        .phone-link:hover {
+            text-decoration: underline;
+        }
+
+        .bed-status-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .bed-status-item {
+            text-align: center;
+            padding: 12px 8px;
+            border-radius: 8px;
+            background: #f9fafb;
+        }
+
+        .bed-type {
+            font-size: 12px;
+            color: #6B7280;
+            margin-bottom: 4px;
+        }
+
+        .bed-count {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .bed-count.available {
+            color: #059669;
+        }
+
+        .bed-count.warning {
+            color: #EA580C;
+        }
+
+        .bed-count.full {
+            color: #DC2626;
+        }
+
+        .request-button {
+            width: 100%;
+            background: #2563EB;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .request-button:hover {
+            background: #1d4ed8;
+        }
+
+        /* 하단 탭바 */
+        .bottom-tabs {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            z-index: 100;
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            background: none;
+            color: #6B7280;
+        }
+
+        .tab-item.active {
+            color: #2563EB;
+        }
+
+        .tab-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .tab-label {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* 플로팅 액션 버튼들 */
+        .floating-actions {
+            position: fixed;
+            right: 20px;
+            bottom: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 90;
+        }
+
+        .fab {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s;
+        }
+
+        .fab:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .fab-primary {
+            background: #2563EB;
+            color: white;
+        }
+
+        .fab-secondary {
+            background: white;
+            color: #374151;
+            border: 1px solid #e5e7eb;
+        }
+
+        .fab-secondary.loading {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* 빈 상태 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6B7280;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 12px;
+            }
+
+            .bed-status-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .hospital-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .user-info {
+                font-size: 12px;
+            }
+
+            .system-title {
+                font-size: 16px;
+            }
+
+            .floating-actions {
+                right: 16px;
+                bottom: 90px;
+            }
+
+            .fab {
+                width: 48px;
+                height: 48px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <div class="header-content">
+            <h1 class="system-title">정신병원입원 의뢰시스템</h1>
+            <div class="header-right">
+                <span class="user-info">강남파출소 경위 홍길동님</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨테이너 -->
+    <main class="main-container">
+        <!-- 필터 영역 -->
+        <section class="filter-section">
+            <div class="filter-toggle">
+                <div class="toggle-switch" id="nightToggle">
+                    <div class="toggle-handle"></div>
+                </div>
+                <label class="filter-label">야간병원만 표시 (18시~09시)</label>
+            </div>
+        </section>
+
+        <!-- 병원 목록 -->
+        <section class="hospital-list" id="hospitalList">
+            <!-- 병원 카드들이 여기에 동적으로 생성됩니다 -->
+        </section>
+    </main>
+
+    <!-- 플로팅 액션 버튼들 -->
+    <div class="floating-actions">
+        <button class="fab fab-secondary" id="refreshButton" onclick="refreshData()" title="새로고침">
+            🔄
+        </button>
+        <button class="fab fab-primary" onclick="createNewRequest()" title="새 의뢰서 작성">
+            ✏️
+        </button>
+    </div>
+
+    <!-- 하단 탭바 -->
+    <nav class="bottom-tabs">
+        <button class="tab-item active" onclick="switchTab('bed-status')">
+            <div class="tab-icon">🏥</div>
+            <div class="tab-label">병상현황</div>
+        </button>
+        <button class="tab-item" onclick="switchTab('history')">
+            <div class="tab-icon">📋</div>
+            <div class="tab-label">신청이력</div>
+        </button>
+        <button class="tab-item" onclick="switchTab('mypage')">
+            <div class="tab-icon">👤</div>
+            <div class="tab-label">마이페이지</div>
+        </button>
+    </nav>
+
+    <script>
+        // 샘플 데이터
+        const hospitalData = [
+            {
+                id: 1,
+                name: "서울대학교병원 정신건강의학과",
+                address: "서울특별시 종로구 대학로 101",
+                phone: "02-2072-2972",
+                nightAvailable: true,
+                beds: {
+                    adult: { used: 9, total: 20 },
+                    youth: { used: 0, total: 10 },
+                    alcohol: { used: 7, total: 10 },
+                    other: { used: 2, total: 5 }
+                }
+            },
+            {
+                id: 2,
+                name: "삼성서울병원 정신건강의학과",
+                address: "서울특별시 강남구 일원로 81",
+                phone: "02-3410-2000",
+                nightAvailable: false,
+                beds: {
+                    adult: { used: 18, total: 20 },
+                    youth: { used: 8, total: 10 },
+                    alcohol: { used: 10, total: 10 },
+                    other: { used: 4, total: 5 }
+                }
+            },
+            {
+                id: 3,
+                name: "강남세브란스병원",
+                address: "서울특별시 강남구 언주로 211",
+                phone: "02-2019-3000",
+                nightAvailable: true,
+                beds: {
+                    adult: { used: 15, total: 20 },
+                    youth: { used: 3, total: 10 },
+                    alcohol: { used: 6, total: 10 },
+                    other: { used: 1, total: 5 }
+                }
+            },
+            {
+                id: 4,
+                name: "서울아산병원 정신건강의학과",
+                address: "서울특별시 송파구 올림픽로43길 88",
+                phone: "02-3010-3000",
+                nightAvailable: true,
+                beds: {
+                    adult: { used: 20, total: 20 },
+                    youth: { used: 10, total: 10 },
+                    alcohol: { used: 8, total: 10 },
+                    other: { used: 5, total: 5 }
+                }
+            }
+        ];
+
+        let isNightFilter = false;
+        let currentData = hospitalData;
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            checkNightTime();
+            renderHospitalList();
+            setupToggle();
+            setupAutoRefresh();
+        });
+
+        // 야간시간 체크 (18시-09시)
+        function checkNightTime() {
+            const now = new Date();
+            const hour = now.getHours();
+            if (hour >= 18 || hour < 9) {
+                toggleNightFilter(true);
+            }
+        }
+
+        // 토글 설정
+        function setupToggle() {
+            const toggle = document.getElementById('nightToggle');
+            toggle.addEventListener('click', function() {
+                toggleNightFilter(!isNightFilter);
+            });
+        }
+
+        // 야간 필터 토글
+        function toggleNightFilter(active) {
+            isNightFilter = active;
+            const toggle = document.getElementById('nightToggle');
+            
+            if (active) {
+                toggle.classList.add('active');
+                currentData = hospitalData.filter(hospital => hospital.nightAvailable);
+            } else {
+                toggle.classList.remove('active');
+                currentData = hospitalData;
+            }
+            
+            renderHospitalList();
+        }
+
+        // 병상 상태 클래스 결정
+        function getBedStatusClass(used, total) {
+            const ratio = used / total;
+            if (ratio >= 1) return 'full';
+            if (ratio >= 0.8) return 'warning';
+            return 'available';
+        }
+
+        // 병원 목록 렌더링
+        function renderHospitalList() {
+            const container = document.getElementById('hospitalList');
+            
+            if (currentData.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🏥</div>
+                        <p>야간 진료 가능한 병원이 없습니다.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = currentData.map(hospital => `
+                <div class="hospital-card" onclick="showHospitalDetail(${hospital.id})">
+                    <div class="hospital-header">
+                        <div>
+                            <div class="hospital-name">${hospital.name}</div>
+                        </div>
+                        <span class="night-badge ${hospital.nightAvailable ? 'available' : 'unavailable'}">
+                            야간진료 ${hospital.nightAvailable ? '가능' : '불가능'}
+                        </span>
+                    </div>
+                    
+                    <div class="hospital-info">
+                        <div>📍 ${hospital.address}</div>
+                        <div>📞 <a href="tel:${hospital.phone}" class="phone-link">${hospital.phone}</a></div>
+                    </div>
+
+                    <div class="bed-status-grid">
+                        <div class="bed-status-item">
+                            <div class="bed-type">성인</div>
+                            <div class="bed-count ${getBedStatusClass(hospital.beds.adult.used, hospital.beds.adult.total)}">
+                                ${hospital.beds.adult.used}/${hospital.beds.adult.total}
+                            </div>
+                        </div>
+                        <div class="bed-status-item">
+                            <div class="bed-type">청소년</div>
+                            <div class="bed-count ${getBedStatusClass(hospital.beds.youth.used, hospital.beds.youth.total)}">
+                                ${hospital.beds.youth.used}/${hospital.beds.youth.total}
+                            </div>
+                        </div>
+                        <div class="bed-status-item">
+                            <div class="bed-type">알코올</div>
+                            <div class="bed-count ${getBedStatusClass(hospital.beds.alcohol.used, hospital.beds.alcohol.total)}">
+                                ${hospital.beds.alcohol.used}/${hospital.beds.alcohol.total}
+                            </div>
+                        </div>
+                        <div class="bed-status-item">
+                            <div class="bed-type">기타</div>
+                            <div class="bed-count ${getBedStatusClass(hospital.beds.other.used, hospital.beds.other.total)}">
+                                ${hospital.beds.other.used}/${hospital.beds.other.total}
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="request-button" onclick="event.stopPropagation(); createRequestToHospital(${hospital.id})">
+                        의뢰서 작성
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // 데이터 새로고침
+        async function refreshData() {
+            const refreshButton = document.getElementById('refreshButton');
+            refreshButton.classList.add('loading');
+            
+            try {
+                // 실제 구현에서는 API 호출
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // 샘플: 일부 데이터 랜덤 업데이트
+                hospitalData.forEach(hospital => {
+                    Object.keys(hospital.beds).forEach(bedType => {
+                        const bed = hospital.beds[bedType];
+                        bed.used = Math.max(0, Math.min(bed.total, 
+                            bed.used + Math.floor(Math.random() * 3) - 1));
+                    });
+                });
+                
+                renderHospitalList();
+                
+            } catch (error) {
+                alert('데이터 새로고침 중 오류가 발생했습니다.');
+            } finally {
+                refreshButton.classList.remove('loading');
+            }
+        }
+
+        // 자동 새로고침 설정 (30초마다)
+        function setupAutoRefresh() {
+            setInterval(refreshData, 30000);
+        }
+
+        // 병원 상세 정보 표시
+        function showHospitalDetail(hospitalId) {
+            const hospital = hospitalData.find(h => h.id === hospitalId);
+            alert(`${hospital.name} 상세 정보\n\n주소: ${hospital.address}\n전화: ${hospital.phone}\n야간진료: ${hospital.nightAvailable ? '가능' : '불가능'}`);
+        }
+
+        // 특정 병원으로 의뢰서 작성
+        function createRequestToHospital(hospitalId) {
+            const hospital = hospitalData.find(h => h.id === hospitalId);
+            alert(`${hospital.name}로 의뢰서 작성 페이지로 이동합니다.`);
+            // 실제 구현: location.href = `/request/create?hospitalId=${hospitalId}`;
+        }
+
+        // 새 의뢰서 작성
+        function createNewRequest() {
+            alert('새 의뢰서 작성 페이지로 이동합니다.');
+            // 실제 구현: location.href = '/request/create';
+        }
+
+        // 탭 전환
+        function switchTab(tabName) {
+            // 모든 탭 비활성화
+            document.querySelectorAll('.tab-item').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 클릭된 탭 활성화
+            event.target.closest('.tab-item').classList.add('active');
+            
+            if (tabName === 'history') {
+                alert('신청이력 페이지로 이동합니다.');
+                // 실제 구현: location.href = '/history';
+            } else if (tabName === 'mypage') {
+                alert('마이페이지로 이동합니다.');
+                // 실제 구현: location.href = '/mypage';
+            }
+        }
+
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                alert('로그아웃되었습니다.');
+                // 실제 구현: location.href = '/login';
+            }
+        }
+    </script>
+</body>
+</html>
