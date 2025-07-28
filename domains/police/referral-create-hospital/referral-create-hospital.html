@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>병원 선택 - 정신병원입원 의뢰 시스템</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1f2937;
+            line-height: 1.5;
+        }
+
+        /* 헤더 */
+        .header {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 16px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #6B7280;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+
+        .back-button:hover {
+            background: #f3f4f6;
+        }
+
+        .header-info {
+            flex: 1;
+        }
+
+        .page-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1B365D;
+            margin-bottom: 2px;
+        }
+
+        .step-indicator {
+            font-size: 12px;
+            color: #6B7280;
+        }
+
+        /* 메인 컨테이너 */
+        .main-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            margin-bottom: 120px;
+        }
+
+        /* 의뢰서 요약 */
+        .request-summary {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .summary-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #6B7280;
+        }
+
+        .check-request-btn {
+            background: none;
+            border: 1px solid #2563EB;
+            color: #2563EB;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .check-request-btn:hover {
+            background: #eff6ff;
+        }
+
+        .patient-info {
+            font-size: 16px;
+            color: #1f2937;
+            font-weight: 500;
+        }
+
+        /* 필터 및 정렬 */
+        .filter-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .filter-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .filter-toggle {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            background: #e5e7eb;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .toggle-switch.active {
+            background: #2563EB;
+        }
+
+        .toggle-handle {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.2s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch.active .toggle-handle {
+            transform: translateX(24px);
+        }
+
+        .filter-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .sort-select {
+            padding: 8px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .sort-select:focus {
+            outline: none;
+            border-color: #2563EB;
+        }
+
+        /* 선택 요약 */
+        .selection-summary {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .selection-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .selection-count {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2563EB;
+        }
+
+        .select-all {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .select-all input {
+            width: 16px;
+            height: 16px;
+            accent-color: #2563EB;
+        }
+
+        .select-all label {
+            font-size: 14px;
+            color: #374151;
+            cursor: pointer;
+        }
+
+        .selected-hospitals {
+            font-size: 12px;
+            color: #6B7280;
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* 병원 목록 */
+        .hospital-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .hospital-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .hospital-card.selected {
+            border-color: #2563EB;
+            background: #eff6ff;
+        }
+
+        .hospital-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .hospital-checkbox {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            accent-color: #2563EB;
+            cursor: pointer;
+        }
+
+        .hospital-info {
+            flex: 1;
+        }
+
+        .hospital-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .hospital-details {
+            font-size: 13px;
+            color: #6B7280;
+            margin-bottom: 8px;
+        }
+
+        .hospital-distance {
+            color: #2563EB;
+            font-weight: 500;
+        }
+
+        .phone-link {
+            color: #2563EB;
+            text-decoration: none;
+        }
+
+        .phone-link:hover {
+            text-decoration: underline;
+        }
+
+        .night-badge {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .night-badge.available {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .night-badge.unavailable {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* 병상 현황 */
+        .bed-status {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .primary-bed {
+            background: white;
+            border-radius: 6px;
+            padding: 6px 10px;
+            text-align: center;
+            min-width: 90px;
+            flex-shrink: 0;
+            border: 2px solid;
+        }
+
+        .primary-bed.available {
+            border-color: #059669;
+        }
+
+        .primary-bed.warning {
+            border-color: #EA580C;
+        }
+
+        .primary-bed.full {
+            border-color: #DC2626;
+        }
+
+        .bed-info-line {
+            font-size: 11px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .status-dot.available {
+            background: #059669;
+        }
+
+        .status-dot.warning {
+            background: #EA580C;
+        }
+
+        .status-dot.full {
+            background: #DC2626;
+        }
+
+        .bed-text {
+            color: #374151;
+        }
+
+        .other-beds {
+            flex: 1;
+            font-size: 11px;
+            color: #6B7280;
+            line-height: 1.5;
+            padding-top: 4px;
+        }
+
+        .other-bed-item {
+            display: inline;
+            margin-right: 8px;
+        }
+
+        .other-bed-item:not(:last-child):after {
+            content: " • ";
+            color: #D1D5DB;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 4px;
+            display: none; /* 세미카드 안으로 이동했으므로 숨김 */
+        }
+
+        /* 하단 액션 */
+        .bottom-actions {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            padding: 16px 20px;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .actions-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-button {
+            padding: 14px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #374151;
+            border: 2px solid #e5e7eb;
+            flex: 1;
+        }
+
+        .btn-secondary:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+
+        .btn-primary {
+            background: #2563EB;
+            color: white;
+            flex: 2;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-primary:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .btn-warning {
+            background: #EA580C;
+            color: white;
+            flex: 2;
+        }
+
+        .btn-warning:hover {
+            background: #c2410c;
+        }
+
+        /* 빈 상태 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6B7280;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 12px;
+            }
+
+            .filter-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+
+            .selection-summary {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+
+            .selection-info {
+                justify-content: space-between;
+            }
+
+            .bed-status {
+                flex-wrap: wrap;
+            }
+
+            .bed-status {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            .primary-bed {
+                min-width: auto;
+                align-self: flex-start;
+                max-width: 160px;
+                padding: 5px 8px;
+            }
+
+            .bed-info-line {
+                font-size: 10px;
+            }
+
+            .other-beds {
+                font-size: 10px;
+                padding-top: 0;
+            }
+
+            .status-indicator {
+                align-self: flex-end;
+                margin-top: -20px;
+                display: none; /* 모바일에서도 숨김 */
+            }
+
+            .actions-content {
+                flex-direction: column;
+            }
+
+            .hospital-details {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <div class="header-content">
+            <button class="back-button" onclick="goBack()">←</button>
+            <div class="header-info">
+                <h1 class="page-title">병원 선택</h1>
+                <div class="step-indicator">2/2 단계</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨테이너 -->
+    <main class="main-container">
+        <!-- 의뢰서 요약 -->
+        <section class="request-summary">
+            <div class="summary-header">
+                <span class="summary-title">의뢰서 요약</span>
+                <button class="check-request-btn" onclick="checkRequest()">의뢰서 확인</button>
+            </div>
+            <div class="patient-info" id="patientSummary">
+                홍길동 (남, 45세) - 성인
+            </div>
+        </section>
+
+        <!-- 필터 및 정렬 -->
+        <section class="filter-section">
+            <div class="filter-row">
+                <div class="filter-toggle">
+                    <div class="toggle-switch" id="nightToggle">
+                        <div class="toggle-handle"></div>
+                    </div>
+                    <label class="filter-label">야간병원만 표시 (현재 시간 기준)</label>
+                </div>
+                
+                <select class="sort-select" id="sortSelect" onchange="sortHospitals()">
+                    <option value="beds">가용 병상 많은 순</option>
+                    <option value="distance">거리 가까운 순</option>
+                    <option value="name">이름순</option>
+                </select>
+            </div>
+        </section>
+
+        <!-- 선택 요약 -->
+        <section class="selection-summary">
+            <div class="selection-info">
+                <div class="selection-count" id="selectionCount">0개 병원 선택됨</div>
+                <div class="select-all">
+                    <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()">
+                    <label for="selectAllCheckbox">전체 선택</label>
+                </div>
+            </div>
+            <div class="selected-hospitals" id="selectedHospitals">
+                선택된 병원이 없습니다
+            </div>
+        </section>
+
+        <!-- 병원 목록 -->
+        <section class="hospital-list" id="hospitalList">
+            <!-- 병원 카드들이 여기에 동적으로 생성됩니다 -->
+        </section>
+    </main>
+
+    <!-- 하단 액션 -->
+    <div class="bottom-actions">
+        <div class="actions-content">
+            <button type="button" class="action-button btn-secondary" onclick="goBack()">
+                이전 단계
+            </button>
+            <button type="button" class="action-button btn-primary" onclick="sendToSelected()" id="sendSelectedBtn" disabled>
+                선택 전송
+            </button>
+            <button type="button" class="action-button btn-warning" onclick="sendToAll()">
+                전체 전송
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 샘플 데이터
+        const hospitalData = [
+            {
+                id: 1,
+                name: "서울대학교병원 정신건강의학과",
+                address: "서울특별시 종로구 대학로 101",
+                phone: "02-2072-2972",
+                distance: 1.2,
+                nightAvailable: true,
+                beds: {
+                    adult: { used: 9, total: 20 },
+                    youth: { used: 0, total: 10 },
+                    alcohol: { used: 7, total: 10 },
+                    other: { used: 2, total: 5 }
+                }
+            },
+            {
+                id: 2,
+                name: "삼성서울병원 정신건강의학과",
+                address: "서울특별시 강남구 일원로 81",
+                phone: "02-3410-2000",
+                distance: 2.5,
+                nightAvailable: false,
+                beds: {
+                    adult: { used: 18, total: 20 },
+                    youth: { used: 8, total: 10 },
+                    alcohol: { used: 10, total: 10 },
+                    other: { used: 4, total: 5 }
+                }
+            },
+            {
+                id: 3,
+                name: "강남세브란스병원",
+                address: "서울특별시 강남구 언주로 211",
+                phone: "02-2019-3000",
+                distance: 0.8,
+                nightAvailable: true,
+                beds: {
+                    adult: { used: 15, total: 20 },
+                    youth: { used: 3, total: 10 },
+                    alcohol: { used: 6, total: 10 },
+                    other: { used: 1, total: 5 }
+                }
+            },
+            {
+                id: 4,
+                name: "서울아산병원 정신건강의학과",
+                address: "서울특별시 송파구 올림픽로43길 88",
+                phone: "02-3010-3000",
+                distance: 3.1,
+                nightAvailable: true,
+                beds: {
+                    adult: { used: 20, total: 20 },
+                    youth: { used: 10, total: 10 },
+                    alcohol: { used: 8, total: 10 },
+                    other: { used: 5, total: 5 }
+                }
+            }
+        ];
+
+        // 환자 정보 (실제로는 이전 단계에서 전달받음)
+        const patientInfo = {
+            name: "홍길동",
+            gender: "남",
+            age: 45,
+            type: "adult" // adult, youth, alcohol, other
+        };
+
+        let isNightFilter = false;
+        let currentData = hospitalData;
+        let selectedHospitals = new Set();
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            checkNightTime();
+            setupToggle();
+            renderHospitalList();
+            updatePatientSummary();
+        });
+
+        // 야간시간 체크
+        function checkNightTime() {
+            const now = new Date();
+            const hour = now.getHours();
+            if (hour >= 18 || hour < 9) {
+                toggleNightFilter(true);
+            }
+        }
+
+        // 환자 요약 정보 업데이트
+        function updatePatientSummary() {
+            const summary = document.getElementById('patientSummary');
+            const typeMap = {
+                adult: '성인',
+                youth: '청소년', 
+                alcohol: '알코올',
+                other: '기타'
+            };
+            summary.textContent = `${patientInfo.name} (${patientInfo.gender}, ${patientInfo.age}세) - ${typeMap[patientInfo.type]}`;
+        }
+
+        // 토글 설정
+        function setupToggle() {
+            const toggle = document.getElementById('nightToggle');
+            toggle.addEventListener('click', function() {
+                toggleNightFilter(!isNightFilter);
+            });
+        }
+
+        // 야간 필터 토글
+        function toggleNightFilter(active) {
+            isNightFilter = active;
+            const toggle = document.getElementById('nightToggle');
+            
+            if (active) {
+                toggle.classList.add('active');
+                currentData = hospitalData.filter(hospital => hospital.nightAvailable);
+            } else {
+                toggle.classList.remove('active');
+                currentData = hospitalData;
+            }
+            
+            sortHospitals();
+        }
+
+        // 병원 정렬
+        function sortHospitals() {
+            const sortBy = document.getElementById('sortSelect').value;
+            
+            switch(sortBy) {
+                case 'beds':
+                    currentData.sort((a, b) => {
+                        const aAvailable = a.beds[patientInfo.type].total - a.beds[patientInfo.type].used;
+                        const bAvailable = b.beds[patientInfo.type].total - b.beds[patientInfo.type].used;
+                        return bAvailable - aAvailable;
+                    });
+                    break;
+                case 'distance':
+                    currentData.sort((a, b) => a.distance - b.distance);
+                    break;
+                case 'name':
+                    currentData.sort((a, b) => a.name.localeCompare(b.name));
+                    break;
+            }
+            
+            renderHospitalList();
+        }
+
+        // 병상 상태 클래스 결정
+        function getBedStatusClass(used, total) {
+            const available = total - used;
+            if (available === 0) return 'full';
+            if (available <= total * 0.2) return 'warning';
+            return 'available';
+        }
+
+        // 병원 목록 렌더링
+        function renderHospitalList() {
+            const container = document.getElementById('hospitalList');
+            
+            if (currentData.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🏥</div>
+                        <p>조건에 맞는 병원이 없습니다.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = currentData.map(hospital => {
+                const primaryBed = hospital.beds[patientInfo.type];
+                const available = primaryBed.total - primaryBed.used;
+                const statusClass = getBedStatusClass(primaryBed.used, primaryBed.total);
+                const isSelected = selectedHospitals.has(hospital.id);
+
+                const otherBeds = Object.entries(hospital.beds)
+                    .filter(([type]) => type !== patientInfo.type)
+                    .map(([type, bed]) => {
+                        const typeMap = { adult: '성인', youth: '청소년', alcohol: '알코올', other: '기타' };
+                        return `${typeMap[type]} ${bed.used}/${bed.total}`;
+                    }).join(' • ');
+
+                return `
+                    <div class="hospital-card ${isSelected ? 'selected' : ''}" onclick="toggleHospital(${hospital.id})">
+                        <div class="hospital-header">
+                            <input type="checkbox" class="hospital-checkbox" 
+                                   ${isSelected ? 'checked' : ''} 
+                                   onchange="toggleHospital(${hospital.id})" 
+                                   onclick="event.stopPropagation()">
+                            <div class="hospital-info">
+                                <div class="hospital-name">${hospital.name}</div>
+                                <div class="hospital-details">
+                                    📍 ${hospital.address} • ${hospital.distance}km • 📞 <a href="tel:${hospital.phone}" class="phone-link" onclick="event.stopPropagation()">${hospital.phone}</a>
+                                </div>
+                            </div>
+                            <div class="night-badge ${hospital.nightAvailable ? 'available' : 'unavailable'}">
+                                야간진료 ${hospital.nightAvailable ? '가능' : '불가능'}
+                            </div>
+                        </div>
+
+                        <div class="bed-status">
+                            <div class="primary-bed ${statusClass}">
+                                <div class="bed-info-line">
+                                    <div class="status-dot ${statusClass}"></div>
+                                    <span class="bed-text">${patientInfo.type === 'adult' ? '성인' : 
+                                                          patientInfo.type === 'youth' ? '청소년' : 
+                                                          patientInfo.type === 'alcohol' ? '알코올' : '기타'}(해당) ${primaryBed.used}/${primaryBed.total} ${available}개</span>
+                                </div>
+                            </div>
+                            
+                            <div class="other-beds">
+                                ${Object.entries(hospital.beds)
+                                    .filter(([type]) => type !== patientInfo.type)
+                                    .map(([type, bed]) => {
+                                        const typeMap = { adult: '성인', youth: '청소년', alcohol: '알코올', other: '기타' };
+                                        return `<span class="other-bed-item">${typeMap[type]} ${bed.used}/${bed.total}</span>`;
+                                    }).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 병원 선택 토글
+        function toggleHospital(hospitalId) {
+            if (selectedHospitals.has(hospitalId)) {
+                selectedHospitals.delete(hospitalId);
+            } else {
+                selectedHospitals.add(hospitalId);
+            }
+            
+            updateSelection();
+            renderHospitalList();
+        }
+
+        // 전체 선택 토글
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            
+            if (selectAllCheckbox.checked) {
+                currentData.forEach(hospital => selectedHospitals.add(hospital.id));
+            } else {
+                selectedHospitals.clear();
+            }
+            
+            updateSelection();
+            renderHospitalList();
+        }
+
+        // 선택 상태 업데이트
+        function updateSelection() {
+            const count = selectedHospitals.size;
+            const countElement = document.getElementById('selectionCount');
+            const selectedElement = document.getElementById('selectedHospitals');
+            const sendSelectedBtn = document.getElementById('sendSelectedBtn');
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            
+            countElement.textContent = `${count}개 병원 선택됨`;
+            
+            if (count === 0) {
+                selectedElement.textContent = '선택된 병원이 없습니다';
+                sendSelectedBtn.disabled = true;
+            } else {
+                const selectedNames = currentData
+                    .filter(hospital => selectedHospitals.has(hospital.id))
+                    .map(hospital => hospital.name)
+                    .join(', ');
+                selectedElement.textContent = selectedNames;
+                sendSelectedBtn.disabled = false;
+            }
+            
+            selectAllCheckbox.checked = count === currentData.length && count > 0;
+            selectAllCheckbox.indeterminate = count > 0 && count < currentData.length;
+        }
+
+        // 액션 함수들
+        function goBack() {
+            if (confirm('선택하신 병원 정보가 저장되지 않을 수 있습니다. 정말 돌아가시겠습니까?')) {
+                history.back();
+            }
+        }
+
+        function checkRequest() {
+            alert('의뢰서 확인 (실제로는 미리보기 모달 표시)');
+        }
+
+        function sendToSelected() {
+            if (selectedHospitals.size === 0) {
+                alert('전송할 병원을 선택해주세요.');
+                return;
+            }
+            
+            const selectedNames = currentData
+                .filter(hospital => selectedHospitals.has(hospital.id))
+                .map(hospital => hospital.name);
+            
+            if (confirm(`선택한 ${selectedHospitals.size}개 병원에 의뢰서를 전송하시겠습니까?\n\n${selectedNames.join('\n')}`)) {
+                alert('선택된 병원에 의뢰서가 전송되었습니다.');
+                // 실제로는 결과 페이지로 이동
+            }
+        }
+
+        function sendToAll() {
+            const count = currentData.length;
+            if (confirm(`현재 표시된 모든 병원(${count}개)에 의뢰서를 전송하시겠습니까?`)) {
+                alert('모든 병원에 의뢰서가 전송되었습니다.');
+                // 실제로는 결과 페이지로 이동
+            }
+        }
+
+        // 초기 선택 상태 업데이트
+        updateSelection();
+    </script>
+</body>
+</html>
