@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>의뢰서 상세 - 정신병원입원 의뢰 시스템</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1f2937;
+            line-height: 1.5;
+        }
+
+        /* 헤더 */
+        .header {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 16px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #6B7280;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+
+        .back-button:hover {
+            background: #f3f4f6;
+        }
+
+        .header-info {
+            flex: 1;
+        }
+
+        .page-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1B365D;
+            margin-bottom: 2px;
+        }
+
+        .referral-number {
+            font-size: 12px;
+            color: #6B7280;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .header-button {
+            background: none;
+            border: 1px solid #e5e7eb;
+            color: #374151;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .header-button:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+
+        /* 메인 컨테이너 */
+        .main-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            margin-bottom: 120px;
+        }
+
+        /* 섹션 공통 스타일 */
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        /* 전체 상태 카드 */
+        .status-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+
+        .status-bar {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            border-radius: 12px 0 0 12px;
+        }
+
+        .status-bar.pending {
+            background: #2563EB;
+        }
+
+        .status-bar.approved {
+            background: #059669;
+        }
+
+        .status-bar.closed {
+            background: #6B7280;
+        }
+
+        .status-content {
+            margin-left: 4px;
+        }
+
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .request-date {
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .status-badge.pending {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .status-badge.approved {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        .status-badge.closed {
+            background: #f3f4f6;
+            color: #6B7280;
+        }
+
+        .status-summary {
+            font-size: 14px;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .elapsed-time {
+            font-size: 12px;
+            color: #6B7280;
+        }
+
+        /* 정보 그리드 */
+        .info-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .info-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .info-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6B7280;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: #1f2937;
+        }
+
+        .phone-link {
+            color: #2563EB;
+            text-decoration: none;
+        }
+
+        .phone-link:hover {
+            text-decoration: underline;
+        }
+
+        .patient-type {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .patient-type.adult {
+            background: #eff6ff;
+            color: #2563EB;
+        }
+
+        .patient-type.youth {
+            background: #f0fdf4;
+            color: #059669;
+        }
+
+        .patient-type.alcohol {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .patient-type.other {
+            background: #f3f4f6;
+            color: #6B7280;
+        }
+
+        /* 사진 그리드 */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .photo-item {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f3f4f6;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .photo-item:hover {
+            transform: scale(1.05);
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 병원 응답 카드 */
+        .hospital-response-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+
+        .hospital-response-card.pending {
+            border-color: #2563EB;
+            background: #eff6ff;
+        }
+
+        .hospital-response-card.approved {
+            border-color: #059669;
+            background: #f0fdf4;
+        }
+
+        .hospital-response-card.rejected {
+            border-color: #DC2626;
+            background: #fef2f2;
+        }
+
+        .hospital-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .hospital-info {
+            flex: 1;
+        }
+
+        .hospital-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .hospital-details {
+            font-size: 13px;
+            color: #6B7280;
+        }
+
+        .response-status {
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .response-status.pending {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .response-status.approved {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        .response-status.rejected {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .response-time {
+            font-size: 12px;
+            color: #6B7280;
+            margin-bottom: 8px;
+        }
+
+        .response-content {
+            font-size: 14px;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .bed-info {
+            font-size: 12px;
+            color: #6B7280;
+            margin-bottom: 12px;
+        }
+
+        .hospital-action {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .hospital-button {
+            background: #059669;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .hospital-button:hover {
+            background: #047857;
+        }
+
+        /* 수정요청 섹션 */
+        .revision-request {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .revision-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .revision-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #92400e;
+        }
+
+        .revision-time {
+            font-size: 12px;
+            color: #78350f;
+        }
+
+        .revision-content {
+            font-size: 14px;
+            color: #92400e;
+            margin-bottom: 12px;
+        }
+
+        .revision-button {
+            background: #f59e0b;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .revision-button:hover {
+            background: #d97706;
+        }
+
+        /* 처리 이력 */
+        .timeline {
+            position: relative;
+            padding-left: 24px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e5e7eb;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 4px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #2563EB;
+        }
+
+        .timeline-time {
+            font-size: 12px;
+            color: #6B7280;
+            margin-bottom: 2px;
+        }
+
+        .timeline-content {
+            font-size: 14px;
+            color: #374151;
+        }
+
+        /* 하단 액션 */
+        .bottom-actions {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            padding: 16px 20px;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .actions-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-button {
+            padding: 14px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            flex: 1;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #374151;
+            border: 2px solid #e5e7eb;
+        }
+
+        .btn-secondary:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+
+        .btn-primary {
+            background: #2563EB;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-warning {
+            background: #EA580C;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #c2410c;
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 12px;
+            }
+
+            .info-row {
+                grid-template-columns: 1fr;
+            }
+
+            .status-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .hospital-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .photo-grid {
+                grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            }
+
+            .actions-content {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <div class="header-content">
+            <button class="back-button" onclick="goBack()">←</button>
+            <div class="header-info">
+                <h1 class="page-title">의뢰서 상세</h1>
+                <div class="referral-number" id="referralNumber">REF-2024-001</div>
+            </div>
+            <div class="header-actions">
+                <button class="header-button" onclick="downloadPDF()">📄 PDF</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨테이너 -->
+    <main class="main-container">
+        <!-- 전체 상태 카드 -->
+        <section class="status-card">
+            <div class="status-bar approved" id="statusBar"></div>
+            <div class="status-content">
+                <div class="status-header">
+                    <span class="request-date" id="requestDate">2024.01.15 14:30</span>
+                    <span class="status-badge approved" id="statusBadge">승인됨</span>
+                </div>
+                <div class="status-summary" id="statusSummary">
+                    3개 병원 중 2개 승인, 1개 대기중
+                </div>
+                <div class="elapsed-time" id="elapsedTime">
+                    신청 후 2시간 30분 경과
+                </div>
+            </div>
+        </section>
+
+        <!-- 환자 정보 섹션 -->
+        <section class="section">
+            <h2 class="section-title">환자 정보</h2>
+            <div class="info-grid">
+                <div class="info-row">
+                    <div class="info-item">
+                        <span class="info-label">환자명</span>
+                        <span class="info-value" id="patientName">홍○○</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">성별/나이</span>
+                        <span class="info-value" id="patientGenderAge">남성, 45세</span>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-item">
+                        <span class="info-label">환자구분</span>
+                        <span class="patient-type adult" id="patientType">성인</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">신장/체중</span>
+                        <span class="info-value" id="patientPhysical">170cm, 70kg</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">보호자</span>
+                    <span class="info-value" id="guardian">
+                        홍영희 (배우자) · <a href="tel:010-0000-0000" class="phone-link">010-0000-0000</a>
+                    </span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">기타 특이사항</span>
+                    <span class="info-value" id="notes">환자가 극도로 흥분상태이며, 자해 위험이 있음. 진정제 투여 필요.</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">첨부 사진</span>
+                    <div class="photo-grid" id="photoGrid">
+                        <div class="photo-item">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23f3f4f6'/%3E%3Ctext x='40' y='45' text-anchor='middle' font-size='12' fill='%236b7280'%3E사진1%3C/text%3E%3C/svg%3E" alt="첨부사진 1">
+                        </div>
+                        <div class="photo-item">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23f3f4f6'/%3E%3Ctext x='40' y='45' text-anchor='middle' font-size='12' fill='%236b7280'%3E사진2%3C/text%3E%3C/svg%3E" alt="첨부사진 2">
+                        </div>
+                        <div class="photo-item">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23f3f4f6'/%3E%3Ctext x='40' y='45' text-anchor='middle' font-size='12' fill='%236b7280'%3E사진3%3C/text%3E%3C/svg%3E" alt="첨부사진 3">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 의뢰자 정보 섹션 -->
+        <section class="section">
+            <h2 class="section-title">의뢰자 정보</h2>
+            <div class="info-item">
+                <span class="info-value" id="requestOfficer">강남파출소 경위 홍길동</span>
+            </div>
+        </section>
+
+        <!-- 수정요청 섹션 (필요시만 표시) -->
+        <section class="revision-request" id="revisionSection" style="display: none;">
+            <div class="revision-header">
+                <span class="revision-title">📝 서울대학교병원에서 수정요청</span>
+                <span class="revision-time">1시간 전 요청</span>
+            </div>
+            <div class="revision-content">
+                환자의 현재 복용 중인 약물 정보가 누락되어 있습니다. 정신과 약물 복용 이력을 추가로 기재해 주세요.
+            </div>
+            <button class="revision-button" onclick="editRequest()">수정하기</button>
+        </section>
+
+        <!-- 병원별 응답 현황 섹션 -->
+        <section class="section">
+            <h2 class="section-title">병원별 응답 현황</h2>
+            <div id="hospitalResponses">
+                <!-- 병원 응답 카드들이 여기에 동적으로 생성됩니다 -->
+            </div>
+        </section>
+
+        <!-- 처리 이력 섹션 -->
+        <section class="section">
+            <h2 class="section-title">처리 이력</h2>
+            <div class="timeline" id="timeline">
+                <!-- 타임라인 항목들이 여기에 동적으로 생성됩니다 -->
+            </div>
+        </section>
+    </main>
+
+    <!-- 하단 액션 -->
+    <div class="bottom-actions" id="bottomActions">
+        <div class="actions-content">
+            <!-- 상태에 따라 버튼들이 동적으로 생성됩니다 -->
+        </div>
+    </div>
+
+    <script>
+        // 샘플 데이터
+        const referralData = {
+            id: 1,
+            number: "REF-2024-001",
+            requestDate: "2024.01.15 14:30",
+            status: "approved", // pending, approved, closed
+            patient: {
+                name: "홍○○",
+                gender: "남성",
+                age: 45,
+                type: "adult",
+                height: 170,
+                weight: 70,
+                guardian: {
+                    name: "홍영희",
+                    relationship: "배우자",
+                    phone: "010-0000-0000"
+                },
+                notes: "환자가 극도로 흥분상태이며, 자해 위험이 있음. 진정제 투여 필요.",
+                photos: ["photo1.jpg", "photo2.jpg", "photo3.jpg"]
+            },
+            officer: {
+                department: "강남파출소",
+                rank: "경위",
+                name: "홍길동"
+            },
+            hospitals: [
+                {
+                    id: 1,
+                    name: "서울대학교병원",
+                    distance: "1.2km",
+                    phone: "02-2072-2972",
+                    status: "approved",
+                    responseTime: "2시간 전 응답",
+                    content: "입원 가능합니다. 성인 병동에 병상이 확보되어 있습니다.",
+                    bedInfo: "성인 병상 11/20 사용중"
+                },
+                {
+                    id: 2,
+                    name: "삼성서울병원", 
+                    distance: "2.5km",
+                    phone: "02-3410-2000",
+                    status: "rejected",
+                    responseTime: "1시간 전 응답",
+                    content: "현재 병상이 모두 차있어 입원이 어렵습니다.",
+                    bedInfo: "성인 병상 20/20 사용중"
+                },
+                {
+                    id: 3,
+                    name: "강남세브란스병원",
+                    distance: "0.8km", 
+                    phone: "02-2019-3000",
+                    status: "pending",
+                    responseTime: "아직 응답 없음",
+                    content: "",
+                    bedInfo: "성인 병상 15/20 사용중"
+                }
+            ],
+            hasRevisionRequest: false,
+            revisionRequest: {
+                hospital: "서울대학교병원",
+                content: "환자의 현재 복용 중인 약물 정보가 누락되어 있습니다. 정신과 약물 복용 이력을 추가로 기재해 주세요.",
+                requestTime: "1시간 전 요청"
+            },
+            timeline: [
+                { time: "14:30", content: "의뢰서 작성 완료" },
+                { time: "15:20", content: "서울대학교병원 승인" },
+                { time: "16:45", content: "삼성서울병원 거부" }
+            ]
+        };
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            renderReferralDetail();
+            setupAutoRefresh();
+        });
+
+        // 의뢰서 상세 렌더링
+        function renderReferralDetail() {
+            updateStatusCard();
+            updatePatientInfo();
+            updateOfficerInfo();
+            renderHospitalResponses();
+            renderTimeline();
+            renderActionButtons();
+            
+            if (referralData.hasRevisionRequest) {
+                showRevisionRequest();
+            }
+        }
+
+        // 상태 카드 업데이트
+        function updateStatusCard() {
+            const statusMap = {
+                pending: { text: '대기', class: 'pending' },
+                approved: { text: '승인됨', class: 'approved' },
+                closed: { text: '종료', class: 'closed' }
+            };
+            
+            const status = statusMap[referralData.status];
+            
+            document.getElementById('referralNumber').textContent = referralData.number;
+            document.getElementById('requestDate').textContent = referralData.requestDate;
+            document.getElementById('statusBadge').textContent = status.text;
+            document.getElementById('statusBadge').className = `status-badge ${status.class}`;
+            document.getElementById('statusBar').className = `status-bar ${status.class}`;
+            
+            // 처리 요약 생성
+            const approved = referralData.hospitals.filter(h => h.status === 'approved').length;
+            const pending = referralData.hospitals.filter(h => h.status === 'pending').length;
+            const rejected = referralData.hospitals.filter(h => h.status === 'rejected').length;
+            
+            let summary = `${referralData.hospitals.length}개 병원 중 `;
+            const parts = [];
+            if (approved > 0) parts.push(`${approved}개 승인`);
+            if (pending > 0) parts.push(`${pending}개 대기`);
+            if (rejected > 0) parts.push(`${rejected}개 거부`);
+            summary += parts.join(', ');
+            
+            document.getElementById('statusSummary').textContent = summary;
+            
+            // 경과 시간 (실제로는 서버에서 계산)
+            document.getElementById('elapsedTime').textContent = '신청 후 2시간 30분 경과';
+        }
+
+        // 환자 정보 업데이트
+        function updatePatientInfo() {
+            const patient = referralData.patient;
+            const typeMap = {
+                adult: '성인',
+                youth: '청소년',
+                alcohol: '알코올',
+                other: '기타'
+            };
+            
+            document.getElementById('patientName').textContent = patient.name;
+            document.getElementById('patientGenderAge').textContent = `${patient.gender}, ${patient.age}세`;
+            document.getElementById('patientType').textContent = typeMap[patient.type];
+            document.getElementById('patientType').className = `patient-type ${patient.type}`;
+            document.getElementById('patientPhysical').textContent = `${patient.height}cm, ${patient.weight}kg`;
+            document.getElementById('guardian').innerHTML = 
+                `${patient.guardian.name} (${patient.guardian.relationship}) · <a href="tel:${patient.guardian.phone}" class="phone-link">${patient.guardian.phone}</a>`;
+            document.getElementById('notes').textContent = patient.notes;
+        }
+
+        // 의뢰자 정보 업데이트
+        function updateOfficerInfo() {
+            const officer = referralData.officer;
+            document.getElementById('requestOfficer').textContent = 
+                `${officer.department} ${officer.rank} ${officer.name}`;
+        }
+
+        // 병원 응답 렌더링
+        function renderHospitalResponses() {
+            const container = document.getElementById('hospitalResponses');
+            
+            const statusMap = {
+                pending: { text: '검토 중', class: 'pending' },
+                approved: { text: '입원 가능', class: 'approved' },
+                rejected: { text: '입원 불가', class: 'rejected' }
+            };
+            
+            container.innerHTML = referralData.hospitals.map(hospital => {
+                const status = statusMap[hospital.status];
+                
+                return `
+                    <div class="hospital-response-card ${hospital.status}">
+                        <div class="hospital-header">
+                            <div class="hospital-info">
+                                <div class="hospital-name">${hospital.name}</div>
+                                <div class="hospital-details">
+                                    📍 ${hospital.distance} · 📞 <a href="tel:${hospital.phone}" class="phone-link">${hospital.phone}</a>
+                                </div>
+                            </div>
+                            <span class="response-status ${hospital.status}">${status.text}</span>
+                        </div>
+                        <div class="response-time">${hospital.responseTime}</div>
+                        ${hospital.content ? `<div class="response-content">${hospital.content}</div>` : ''}
+                        <div class="bed-info">${hospital.bedInfo}</div>
+                        ${hospital.status === 'approved' ? 
+                            `<div class="hospital-action">
+                                <button class="hospital-button" onclick="processAdmissionToHospital(${hospital.id})">입원 처리</button>
+                            </div>` : ''
+                        }
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 수정요청 표시
+        function showRevisionRequest() {
+            const section = document.getElementById('revisionSection');
+            section.style.display = 'block';
+        }
+
+        // 타임라인 렌더링
+        function renderTimeline() {
+            const container = document.getElementById('timeline');
+            
+            container.innerHTML = referralData.timeline.map(item => `
+                <div class="timeline-item">
+                    <div class="timeline-time">${item.time}</div>
+                    <div class="timeline-content">${item.content}</div>
+                </div>
+            `).join('');
+        }
+
+        // 액션 버튼 렌더링
+        function renderActionButtons() {
+            const container = document.querySelector('.actions-content');
+            
+            if (referralData.status === 'closed') {
+                // 종료 상태일 때는 액션 버튼 없음
+                document.getElementById('bottomActions').style.display = 'none';
+                return;
+            }
+            
+            let buttons = '';
+            
+            if (referralData.status === 'pending') {
+                if (referralData.hasRevisionRequest) {
+                    buttons += `<button class="action-button btn-warning" onclick="editRequest()">수정하기</button>`;
+                }
+                buttons += `<button class="action-button btn-secondary" onclick="closeRequest()">종료하기</button>`;
+            } else if (referralData.status === 'approved') {
+                buttons += `<button class="action-button btn-secondary" onclick="closeRequest()">종료하기</button>`;
+            }
+            
+            container.innerHTML = buttons;
+        }
+
+        // 자동 새로고침 (30초마다)
+        function setupAutoRefresh() {
+            setInterval(() => {
+                // 실제로는 서버에서 최신 데이터 조회
+                console.log('자동 새로고침 중...');
+                // updateReferralData();
+            }, 30000);
+        }
+
+        // 사진 확대 보기
+        function enlargePhoto(index) {
+            alert(`사진 ${index + 1} 확대 보기`);
+            // 실제로는 모달로 사진 확대 표시
+        }
+
+        // 액션 함수들
+        function goBack() {
+            if (confirm('의뢰서 상세 페이지를 나가시겠습니까?')) {
+                history.back();
+            }
+        }
+
+        function downloadPDF() {
+            alert('PDF 다운로드를 시작합니다.');
+            // 실제로는 서버에서 PDF 생성 후 다운로드
+        }
+
+        function editRequest() {
+            if (confirm('의뢰서를 수정하시겠습니까?')) {
+                alert('의뢰서 수정 페이지로 이동합니다.');
+                // 실제로는 수정 페이지로 이동
+            }
+        }
+
+        function processAdmission() {
+            const approvedHospitals = referralData.hospitals.filter(h => h.status === 'approved');
+            
+            if (approvedHospitals.length === 0) {
+                alert('승인된 병원이 없습니다.');
+                return;
+            }
+            
+            if (approvedHospitals.length === 1) {
+                if (confirm(`${approvedHospitals[0].name}으로 입원 처리하시겠습니까?`)) {
+                    alert('입원 처리가 완료되었습니다.');
+                    // 실제로는 서버에 입원 처리 요청
+                }
+            } else {
+                // 여러 병원이 승인한 경우 선택 모달 표시
+                showHospitalSelectionModal(approvedHospitals);
+            }
+        }
+
+        function processAdmissionToHospital(hospitalId) {
+            const hospital = referralData.hospitals.find(h => h.id === hospitalId);
+            
+            if (!hospital || hospital.status !== 'approved') {
+                alert('입원 처리할 수 없는 병원입니다.');
+                return;
+            }
+            
+            if (confirm(`${hospital.name}으로 입원 처리하시겠습니까?\n\n입원 처리 후에는 취소할 수 없습니다.`)) {
+                alert(`${hospital.name} 입원 처리가 완료되었습니다.`);
+                // 실제로는 서버에 입원 처리 요청
+                // 성공 시 페이지 새로고침 또는 상태 업데이트
+            }
+        }
+
+        function showHospitalSelectionModal(hospitals) {
+            const hospitalList = hospitals.map(h => h.name).join('\n');
+            const selected = prompt(`입원할 병원을 선택하세요:\n\n${hospitalList}\n\n병원명을 입력하세요:`);
+            
+            const selectedHospital = hospitals.find(h => h.name === selected);
+            if (selectedHospital) {
+                if (confirm(`${selectedHospital.name}으로 입원 처리하시겠습니까?`)) {
+                    alert('입원 처리가 완료되었습니다.');
+                    // 실제로는 서버에 입원 처리 요청
+                }
+            } else {
+                alert('올바른 병원명을 입력하세요.');
+            }
+        }
+
+        function closeRequest() {
+            const reason = prompt('종료 사유를 입력하세요:');
+            if (reason) {
+                if (confirm('정말로 의뢰를 종료하시겠습니까?')) {
+                    alert('의뢰가 종료되었습니다.');
+                    // 실제로는 서버에 종료 처리 요청
+                }
+            }
+        }
+
+        // 사진 클릭 이벤트 설정
+        document.addEventListener('DOMContentLoaded', function() {
+            const photoItems = document.querySelectorAll('.photo-item');
+            photoItems.forEach((item, index) => {
+                item.addEventListener('click', () => enlargePhoto(index));
+            });
+        });
+    </script>
+</body>
+</html>
