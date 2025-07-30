@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마이페이지 - 정신병원입원 의뢰 시스템</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1f2937;
+            line-height: 1.5;
+        }
+
+        /* 헤더 */
+        .header {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 16px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .system-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1B365D;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-info {
+            font-size: 14px;
+            color: #374151;
+        }
+
+        /* 메인 컨테이너 */
+        .main-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            margin-bottom: 80px;
+        }
+
+        /* 섹션 공통 스타일 */
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        /* 정보 그리드 */
+        .info-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #6B7280;
+            flex-shrink: 0;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: #1f2937;
+            font-weight: 500;
+            text-align: right;
+        }
+
+        /* 편집모드에서도 가로 배치 유지 */
+        .edit-mode .info-item:not(.vertical) {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-direction: row;
+        }
+
+        .edit-mode .info-item:not(.vertical) .info-label {
+            flex-shrink: 0;
+            margin-right: 16px;
+        }
+
+        .edit-mode .info-item:not(.vertical) .form-input,
+        .edit-mode .info-item:not(.vertical) .form-select {
+            max-width: 200px;
+            flex-shrink: 0;
+        }
+
+        .edit-mode .info-value {
+            width: auto;
+        }
+        .info-item.vertical {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .info-item.vertical .info-value,
+        .info-item.vertical .id-card-container,
+        .info-item.vertical .file-input-wrapper,
+        .info-item.vertical .password-input {
+            text-align: left;
+            width: 100%;
+        }
+        .id-card-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .id-card-thumbnail {
+            width: 80px;
+            height: 50px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f3f4f6;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .id-card-thumbnail:hover {
+            transform: scale(1.05);
+        }
+
+        .id-card-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .id-card-info {
+            flex: 1;
+            font-size: 12px;
+            color: #6B7280;
+        }
+
+        /* 편집 모드 */
+        .edit-mode {
+            display: none;
+        }
+
+        .edit-mode.active {
+            display: block;
+        }
+
+        .view-mode.editing {
+            display: none;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #2563EB;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .password-input {
+            position: relative;
+        }
+
+        .password-help {
+            font-size: 11px;
+            color: #6B7280;
+            margin-top: 4px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-input-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .file-input-button:hover {
+            background: #e5e7eb;
+        }
+
+        /* 버튼 스타일 */
+        .btn-primary {
+            background: #2563EB;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #374151;
+            border: 2px solid #e5e7eb;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+
+        .btn-danger {
+            background: #DC2626;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-danger:hover {
+            background: #B91C1C;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        /* 액션 버튼 */
+        .action-button {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            color: #374151;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .action-button:hover {
+            border-color: #2563EB;
+            color: #2563EB;
+            background: #eff6ff;
+        }
+
+        .action-button-icon {
+            font-size: 16px;
+        }
+
+        .logout-button {
+            background: #DC2626;
+            color: white;
+            border: none;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            width: 100%;
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        .logout-button:hover {
+            background: #B91C1C;
+        }
+
+        /* 하단 탭바 */
+        .bottom-tabs {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            z-index: 100;
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            background: none;
+            color: #6B7280;
+        }
+
+        .tab-item.active {
+            color: #2563EB;
+        }
+
+        .tab-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .tab-label {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 12px;
+            }
+
+            .info-row {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .user-info {
+                font-size: 12px;
+            }
+
+            .system-title {
+                font-size: 16px;
+            }
+
+            .id-card-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+        }
+
+        /* 모달 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow: auto;
+        }
+
+        .modal-content img {
+            width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <div class="header-content">
+            <h1 class="system-title">마이페이지</h1>
+        </div>
+    </header>
+
+    <!-- 메인 컨테이너 -->
+    <main class="main-container">
+        <!-- 계정 정보 섹션 -->
+        <section class="section">
+            <h2 class="section-title">계정 정보</h2>
+            
+            <!-- 조회 모드 -->
+            <div class="view-mode" id="viewMode">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">아이디</span>
+                        <span class="info-value" id="userId">police001</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">이름</span>
+                        <span class="info-value" id="userName">홍길동</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">가입일자</span>
+                        <span class="info-value" id="joinDate">2024.01.15</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">지역</span>
+                        <span class="info-value" id="regionDisplay">서울특별시</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">경찰서</span>
+                        <span class="info-value" id="stationDisplay">강남경찰서</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">파출소</span>
+                        <span class="info-value" id="substationDisplay">강남파출소</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">계급</span>
+                        <span class="info-value" id="rankDisplay">경위</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">휴대폰 번호</span>
+                        <span class="info-value" id="phoneDisplay">010-1234-5678</span>
+                    </div>
+                    <div class="info-item vertical">
+                        <span class="info-label">공무원증</span>
+                        <div class="id-card-container">
+                            <div class="id-card-thumbnail" onclick="viewIdCard()">
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='50' viewBox='0 0 80 50'%3E%3Crect width='80' height='50' fill='%23f3f4f6'/%3E%3Ctext x='40' y='28' text-anchor='middle' font-size='10' fill='%236b7280'%3E공무원증%3C/text%3E%3C/svg%3E" alt="공무원증">
+                            </div>
+                            <div class="id-card-info">클릭하여 확대보기</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-primary" onclick="enterEditMode()">수정</button>
+                </div>
+            </div>
+
+            <!-- 편집 모드 -->
+            <div class="edit-mode" id="editMode">
+                <form id="editForm">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">아이디</span>
+                            <span class="info-value">police001</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">이름</span>
+                            <span class="info-value">홍길동</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">가입일자</span>
+                            <span class="info-value">2024.01.15</span>
+                        </div>
+                        <div class="info-item">
+                            <label class="info-label" for="regionSelect">지역</label>
+                            <select class="form-select" id="regionSelect" name="region">
+                                <option value="서울특별시">서울특별시</option>
+                                <option value="부산광역시">부산광역시</option>
+                                <option value="대구광역시">대구광역시</option>
+                                <option value="인천광역시">인천광역시</option>
+                            </select>
+                        </div>
+                        <div class="info-item">
+                            <label class="info-label" for="stationInput">경찰서</label>
+                            <input type="text" class="form-input" id="stationInput" name="station" value="강남경찰서">
+                        </div>
+                        <div class="info-item">
+                            <label class="info-label" for="substationInput">파출소</label>
+                            <input type="text" class="form-input" id="substationInput" name="substation" value="강남파출소">
+                        </div>
+                        <div class="info-item">
+                            <label class="info-label" for="rankSelect">계급</label>
+                            <select class="form-select" id="rankSelect" name="rank">
+                                <option value="순경">순경</option>
+                                <option value="경장">경장</option>
+                                <option value="경사">경사</option>
+                                <option value="경위" selected>경위</option>
+                                <option value="경감">경감</option>
+                            </select>
+                        </div>
+                        <div class="info-item">
+                            <label class="info-label" for="phoneInput">휴대폰 번호</label>
+                            <input type="tel" class="form-input" id="phoneInput" name="phone" value="010-1234-5678" placeholder="010-0000-0000">
+                        </div>
+                        <div class="info-item vertical">
+                            <label class="info-label" for="idCardInput">공무원증</label>
+                            <div class="file-input-wrapper">
+                                <input type="file" class="file-input" id="idCardInput" name="idCard" accept="image/*">
+                                <div class="file-input-button">
+                                    📷 새 공무원증 업로드
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-item vertical">
+                            <label class="info-label" for="passwordInput">새 비밀번호</label>
+                            <div class="password-input">
+                                <input type="password" class="form-input" id="passwordInput" name="password" placeholder="변경하지 않으려면 비워두세요">
+                                <div class="password-help">비밀번호를 변경하면 자동으로 로그아웃됩니다</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn-secondary" onclick="cancelEdit()">취소</button>
+                        <button type="submit" class="btn-primary">저장</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- 로그아웃 버튼 -->
+        <button class="logout-button" onclick="logout()">로그아웃</button>
+    </main>
+
+    <!-- 하단 탭바 -->
+    <nav class="bottom-tabs">
+        <button class="tab-item" onclick="switchTab('bed-status')">
+            <div class="tab-icon">🏥</div>
+            <div class="tab-label">병상현황</div>
+        </button>
+        <button class="tab-item" onclick="switchTab('history')">
+            <div class="tab-icon">📋</div>
+            <div class="tab-label">신청이력</div>
+        </button>
+        <button class="tab-item active" onclick="switchTab('mypage')">
+            <div class="tab-icon">👤</div>
+            <div class="tab-label">마이페이지</div>
+        </button>
+    </nav>
+
+    <!-- 공무원증 확대 모달 -->
+    <div class="modal" id="idCardModal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='250' viewBox='0 0 400 250'%3E%3Crect width='400' height='250' fill='%23f3f4f6'/%3E%3Ctext x='200' y='130' text-anchor='middle' font-size='20' fill='%236b7280'%3E공무원증 (확대)%3C/text%3E%3C/svg%3E" alt="공무원증 확대">
+        </div>
+    </div>
+
+    <script>
+        // 편집 모드 진입
+        function enterEditMode() {
+            document.getElementById('viewMode').classList.add('editing');
+            document.getElementById('editMode').classList.add('active');
+        }
+
+        // 편집 취소
+        function cancelEdit() {
+            document.getElementById('viewMode').classList.remove('editing');
+            document.getElementById('editMode').classList.remove('active');
+            
+            // 폼 초기화
+            document.getElementById('editForm').reset();
+            document.getElementById('regionSelect').value = '서울특별시';
+            document.getElementById('stationInput').value = '강남경찰서';
+            document.getElementById('substationInput').value = '강남파출소';
+            document.getElementById('rankSelect').value = '경위';
+            document.getElementById('phoneInput').value = '010-1234-5678';
+        }
+
+        // 폼 제출 처리
+        document.getElementById('editForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const hasPasswordChange = formData.get('password').trim() !== '';
+            
+            // 전화번호 형식 검증
+            const phone = formData.get('phone');
+            const phoneRegex = /^010-\d{4}-\d{4}$/;
+            if (!phoneRegex.test(phone)) {
+                alert('올바른 전화번호 형식을 입력하세요. (010-0000-0000)');
+                return;
+            }
+            
+            if (confirm('정보를 수정하시겠습니까?')) {
+                // 실제로는 서버에 업데이트 요청
+                updateDisplayValues(formData);
+                
+                document.getElementById('viewMode').classList.remove('editing');
+                document.getElementById('editMode').classList.remove('active');
+                
+                if (hasPasswordChange) {
+                    alert('정보가 수정되었습니다.\n비밀번호가 변경되어 자동 로그아웃됩니다. 새 비밀번호로 다시 로그인해주세요.');
+                    // 실제로는 서버에서 로그아웃 처리 후 로그인 페이지로 이동
+                    // location.href = '/login';
+                } else {
+                    alert('정보가 수정되었습니다.');
+                }
+            }
+        });
+
+        // 화면 표시값 업데이트
+        function updateDisplayValues(formData) {
+            document.getElementById('regionDisplay').textContent = formData.get('region');
+            document.getElementById('stationDisplay').textContent = formData.get('station');
+            document.getElementById('substationDisplay').textContent = formData.get('substation');
+            document.getElementById('rankDisplay').textContent = formData.get('rank');
+            document.getElementById('phoneDisplay').textContent = formData.get('phone');
+        }
+
+        // 전화번호 자동 하이픈 추가
+        document.getElementById('phoneInput').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^\d]/g, '');
+            let formattedValue = '';
+            
+            if (value.length > 3 && value.length <= 7) {
+                formattedValue = value.slice(0, 3) + '-' + value.slice(3);
+            } else if (value.length > 7) {
+                formattedValue = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7, 11);
+            } else {
+                formattedValue = value;
+            }
+            
+            e.target.value = formattedValue;
+        });
+
+        // 파일 업로드 버튼 처리
+        document.getElementById('idCardInput').addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name || '새 공무원증 업로드';
+            document.querySelector('.file-input-button').textContent = `📷 ${fileName}`;
+        });
+
+        // 공무원증 확대보기
+        function viewIdCard() {
+            document.getElementById('idCardModal').classList.add('active');
+        }
+
+        // 모달 닫기
+        function closeModal() {
+            document.getElementById('idCardModal').classList.remove('active');
+        }
+
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                alert('로그아웃되었습니다.');
+                // 실제로는 서버에 로그아웃 요청 후 로그인 페이지로 이동
+                // location.href = '/login';
+            }
+        }
+
+        // 탭 전환
+        function switchTab(tabName) {
+            // 모든 탭 비활성화
+            document.querySelectorAll('.tab-item').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            if (tabName === 'bed-status') {
+                alert('병상현황 페이지로 이동합니다.');
+                // 실제로는 location.href = '/beds-status';
+            } else if (tabName === 'history') {
+                alert('신청이력 페이지로 이동합니다.');
+                // 실제로는 location.href = '/history';
+            } else if (tabName === 'mypage') {
+                // 현재 페이지이므로 활성화만
+                event.target.closest('.tab-item').classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>
