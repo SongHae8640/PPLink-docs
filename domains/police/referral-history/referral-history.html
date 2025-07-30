@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>신청 이력 - 정신병원입원 의뢰 시스템</title>
+    <title>의뢰 이력 - 정신병원입원 의뢰 시스템</title>
     <style>
         * {
             margin: 0;
@@ -15,97 +15,92 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #f8fafc;
             color: #1f2937;
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
         /* 헤더 */
         .header {
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-            color: white;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             padding: 16px 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
-        .header-title {
-            font-size: 18px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-        }
-
-        .header-title::before {
-            content: '📋';
-            margin-right: 8px;
+        .system-title {
             font-size: 20px;
+            font-weight: 700;
+            color: #1B365D;
         }
 
         .header-actions {
             display: flex;
-            gap: 8px;
+            gap: 12px;
         }
 
-        .header-btn {
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: white;
+        .header-button {
+            background: none;
+            border: 1px solid #e5e7eb;
+            color: #374151;
             padding: 8px 12px;
             border-radius: 6px;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s;
         }
 
-        .header-btn:hover {
-            background: rgba(255,255,255,0.2);
-        }
-
-        /* 네비게이션 탭 */
-        .nav-tabs {
-            background: white;
-            border-bottom: 1px solid #e5e7eb;
-            padding: 0 20px;
-        }
-
-        .nav-tabs-content {
-            max-width: 800px;
-            margin: 0 auto;
-            display: flex;
-        }
-
-        .nav-tab {
-            padding: 16px 20px;
-            border: none;
-            background: none;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            color: #6b7280;
-            border-bottom: 2px solid transparent;
-            transition: all 0.3s ease;
-        }
-
-        .nav-tab.active {
-            color: #2563eb;
-            border-bottom-color: #2563eb;
-        }
-
-        .nav-tab:hover {
-            color: #2563eb;
+        .header-button:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
         }
 
         /* 메인 컨테이너 */
         .main-container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+            margin-bottom: 80px;
+        }
+
+        /* 탭 네비게이션 */
+        .tab-navigation {
+            display: flex;
+            background: white;
+            border-radius: 12px;
+            padding: 6px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            background: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #6B7280;
+        }
+
+        .tab-button.active {
+            background: #2563EB;
+            color: white;
+        }
+
+        .tab-button:not(.active):hover {
+            background: #f3f4f6;
         }
 
         /* 필터 영역 */
@@ -114,14 +109,14 @@
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .filter-row {
             display: flex;
-            gap: 20px;
+            gap: 16px;
             align-items: center;
-            flex-wrap: wrap;
+            margin-bottom: 16px;
         }
 
         .filter-group {
@@ -131,19 +126,23 @@
         }
 
         .filter-label {
-            font-size: 14px;
-            font-weight: 500;
-            color: #374151;
+            font-size: 12px;
+            font-weight: 600;
+            color: #6B7280;
         }
 
         .filter-select {
             padding: 8px 12px;
-            border: 1px solid #d1d5db;
+            border: 2px solid #e5e7eb;
             border-radius: 6px;
+            font-size: 14px;
             background: white;
             cursor: pointer;
-            font-size: 14px;
-            min-width: 120px;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #2563EB;
         }
 
         .status-filters {
@@ -155,152 +154,145 @@
         .status-filter {
             display: flex;
             align-items: center;
+            gap: 6px;
             cursor: pointer;
-            font-size: 14px;
         }
 
         .status-filter input {
-            margin-right: 6px;
-            transform: scale(1.1);
+            width: 16px;
+            height: 16px;
+            accent-color: #2563EB;
         }
 
-        /* 정렬 헤더 */
-        .list-header {
-            background: white;
-            border-radius: 12px;
-            padding: 16px 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .list-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1f2937;
-        }
-
-        .sort-select {
-            padding: 8px 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            background: white;
+        .status-filter label {
+            font-size: 13px;
+            color: #374151;
             cursor: pointer;
+        }
+
+        /* 목록 헤더 */
+        .list-header {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .result-count {
             font-size: 14px;
+            color: #6B7280;
         }
 
         /* 의뢰서 목록 */
-        .requests-list {
+        .request-list {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px;
         }
 
         .request-card {
             background: white;
             border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            border-left: 4px solid #e5e7eb;
-            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
             position: relative;
         }
 
         .request-card:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
         }
 
-        .request-card.status-pending {
-            border-left-color: #2563eb;
+        .status-bar {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
         }
 
-        .request-card.status-approved {
-            border-left-color: #059669;
+        .status-bar.pending {
+            background: #2563EB;
         }
 
-        .request-card.status-rejected {
-            border-left-color: #dc2626;
+        .status-bar.approved {
+            background: #059669;
         }
 
-        .request-card.status-revision {
-            border-left-color: #d97706;
+        .status-bar.closed {
+            background: #6B7280;
         }
 
-        .request-card.status-expired {
-            border-left-color: #6b7280;
-            opacity: 0.8;
+        .card-content {
+            padding: 20px;
+            margin-left: 4px;
         }
 
-        .request-card.urgent {
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-        }
-
-        .request-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
+        .card-header {
             margin-bottom: 12px;
         }
 
-        .patient-info {
-            flex: 1;
-        }
-
-        .patient-name {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1f2937;
+        .patient-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 4px;
         }
 
-        .patient-details {
+        .patient-left {
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-bottom: 8px;
         }
 
-        .patient-type-badge {
+        .patient-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-row {
+            display: flex;
+            align-items: center;
+        }
+
+        .patient-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .patient-type {
             padding: 2px 8px;
             border-radius: 12px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 500;
         }
 
-        .patient-type-badge.adult {
-            background: #dbeafe;
-            color: #1e40af;
+        .patient-type.adult {
+            background: #eff6ff;
+            color: #2563EB;
         }
 
-        .patient-type-badge.youth {
-            background: #ecfdf5;
-            color: #065f46;
+        .patient-type.youth {
+            background: #f0fdf4;
+            color: #059669;
         }
 
-        .patient-type-badge.alcohol {
+        .patient-type.alcohol {
             background: #fef3c7;
-            color: #92400e;
+            color: #d97706;
         }
 
-        .patient-type-badge.other {
-            background: #f3e8ff;
-            color: #7c3aed;
+        .patient-type.other {
+            background: #f3f4f6;
+            color: #6B7280;
         }
 
-        .request-time {
-            font-size: 14px;
-            color: #6b7280;
-        }
-
-        .status-info {
-            text-align: right;
+        .request-date {
+            font-size: 12px;
+            color: #6B7280;
         }
 
         .status-badge {
@@ -308,188 +300,224 @@
             border-radius: 16px;
             font-size: 12px;
             font-weight: 500;
-            margin-bottom: 4px;
-            display: inline-block;
+            white-space: nowrap;
         }
 
         .status-badge.pending {
             background: #dbeafe;
-            color: #1e40af;
+            color: #1d4ed8;
         }
 
         .status-badge.approved {
             background: #d1fae5;
-            color: #065f46;
+            color: #047857;
         }
 
-        .status-badge.rejected {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .status-badge.revision {
-            background: #fed7aa;
-            color: #9a3412;
-        }
-
-        .status-badge.expired {
+        .status-badge.closed {
             background: #f3f4f6;
-            color: #4b5563;
+            color: #6B7280;
         }
 
-        .urgent-warning {
-            font-size: 12px;
-            color: #dc2626;
+        .request-details {
+            font-size: 13px;
+            color: #6B7280;
+            margin-bottom: 12px;
+        }
+
+        .hospital-count {
             font-weight: 500;
-        }
-
-        .hospital-info {
-            margin: 12px 0;
-            padding: 12px;
-            background: #f9fafb;
-            border-radius: 8px;
-        }
-
-        .hospital-summary {
-            font-size: 14px;
             color: #374151;
+        }
+
+        .special-notices {
+            margin-bottom: 12px;
+        }
+
+        .revision-notice {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: #EA580C;
+            font-weight: 500;
             margin-bottom: 4px;
         }
 
-        .hospital-status {
-            font-size: 13px;
-            color: #6b7280;
+        .urgent-warning {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: #DC2626;
+            font-weight: 500;
         }
 
-        .request-actions {
+        .card-actions {
             display: flex;
             gap: 8px;
-            margin-top: 12px;
         }
 
-        .action-btn {
-            padding: 8px 16px;
-            border: none;
+        .action-button {
+            padding: 6px 12px;
             border-radius: 6px;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s;
+            border: none;
         }
 
-        .btn-primary {
-            background: #2563eb;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #1d4ed8;
-        }
-
-        .btn-secondary {
+        .btn-detail {
             background: #f3f4f6;
             color: #374151;
-            border: 1px solid #d1d5db;
         }
 
-        .btn-secondary:hover {
+        .btn-detail:hover {
             background: #e5e7eb;
         }
 
-        .btn-success {
-            background: #059669;
-            color: white;
+        .btn-admit {
+            background: #d1fae5;
+            color: #047857;
         }
 
-        .btn-success:hover {
-            background: #047857;
+        .btn-admit:hover {
+            background: #a7f3d0;
         }
 
-        .btn-warning {
-            background: #d97706;
-            color: white;
+        .btn-edit {
+            background: #fef3c7;
+            color: #d97706;
         }
 
-        .btn-warning:hover {
-            background: #b45309;
+        .btn-edit:hover {
+            background: #fde68a;
         }
 
         /* 빈 상태 */
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 80px 20px;
+            color: #6B7280;
         }
 
-        .empty-icon {
-            font-size: 48px;
+        .empty-state-icon {
+            font-size: 64px;
             margin-bottom: 16px;
+            opacity: 0.5;
         }
 
-        .empty-title {
+        .empty-state-title {
             font-size: 18px;
             font-weight: 600;
-            color: #1f2937;
             margin-bottom: 8px;
+            color: #374151;
         }
 
-        .empty-message {
+        .empty-state-message {
             font-size: 14px;
-            color: #6b7280;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
-        .empty-action {
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        .empty-state-action {
+            background: #2563EB;
             color: white;
             border: none;
             padding: 12px 24px;
             border-radius: 8px;
-            font-size: 16px;
-            font-weight: 500;
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: background-color 0.2s;
         }
 
-        .empty-action:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        .empty-state-action:hover {
+            background: #1d4ed8;
+        }
+
+        /* 하단 탭바 */
+        .bottom-tabs {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            z-index: 100;
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            background: none;
+            color: #6B7280;
+        }
+
+        .tab-item.active {
+            color: #2563EB;
+        }
+
+        .tab-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .tab-label {
+            font-size: 12px;
+            font-weight: 500;
         }
 
         /* 반응형 */
-        @media (max-width: 640px) {
+        @media (max-width: 768px) {
             .main-container {
-                padding: 16px;
+                padding: 12px;
             }
-            
+
             .filter-row {
                 flex-direction: column;
                 align-items: stretch;
-            }
-            
-            .status-filters {
-                justify-content: space-between;
-            }
-            
-            .list-header {
-                flex-direction: column;
                 gap: 12px;
-                align-items: stretch;
             }
-            
-            .request-header {
-                flex-direction: column;
+
+            .status-filters {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
                 gap: 8px;
             }
-            
-            .status-info {
-                text-align: left;
+
+            .list-header {
+                align-items: stretch;
+                gap: 12px;
             }
-            
-            .request-actions {
+
+            .card-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            .patient-info {
+                gap: 4px;
                 flex-wrap: wrap;
+            }
+
+            .request-details {
+                font-size: 12px;
+            }
+
+            .card-actions {
+                flex-wrap: wrap;
+            }
+
+            .tab-navigation {
+                display: none;
             }
         }
     </style>
@@ -498,385 +526,372 @@
     <!-- 헤더 -->
     <header class="header">
         <div class="header-content">
-            <div class="header-title">신청 이력</div>
+            <h1 class="system-title">의뢰 이력</h1>
             <div class="header-actions">
-                <button class="header-btn" onclick="refreshData()">🔄 새로고침</button>
-                <button class="header-btn" onclick="searchRequests()">🔍 검색</button>
+                <button class="header-button" onclick="refreshData()">🔄 새로고침</button>
+                <button class="header-button" onclick="openSearch()">🔍 검색</button>
             </div>
         </div>
     </header>
 
-    <!-- 네비게이션 탭 -->
-    <nav class="nav-tabs">
-        <div class="nav-tabs-content">
-            <button class="nav-tab" onclick="switchTab('dashboard')">병상현황</button>
-            <button class="nav-tab active" onclick="switchTab('history')">신청이력</button>
-            <button class="nav-tab" onclick="switchTab('profile')">마이페이지</button>
-        </div>
-    </nav>
-
     <!-- 메인 컨테이너 -->
     <main class="main-container">
+        <!-- 탭 네비게이션 (데스크톱만) -->
+        <nav class="tab-navigation">
+            <button class="tab-button" onclick="switchTab('bed-status')">병상현황</button>
+            <button class="tab-button active" onclick="switchTab('history')">의뢰 이력</button>
+            <button class="tab-button" onclick="switchTab('mypage')">마이페이지</button>
+        </nav>
+
         <!-- 필터 영역 -->
         <section class="filter-section">
             <div class="filter-row">
                 <div class="filter-group">
                     <label class="filter-label">기간</label>
-                    <select class="filter-select" id="periodFilter" onchange="filterRequests()">
+                    <select class="filter-select" id="periodFilter" onchange="applyFilters()">
                         <option value="week">최근 1주일</option>
                         <option value="month">최근 1개월</option>
                         <option value="quarter">최근 3개월</option>
                         <option value="all">전체</option>
                     </select>
                 </div>
-                
+            </div>
+            
+            <div class="filter-row">
                 <div class="filter-group">
-                    <label class="filter-label">상태 필터</label>
+                    <label class="filter-label">상태</label>
                     <div class="status-filters">
-                        <label class="status-filter">
-                            <input type="checkbox" value="all" checked onchange="filterByStatus()">
-                            전체
-                        </label>
-                        <label class="status-filter">
-                            <input type="checkbox" value="pending" onchange="filterByStatus()">
-                            대기중
-                        </label>
-                        <label class="status-filter">
-                            <input type="checkbox" value="approved" onchange="filterByStatus()">
-                            승인
-                        </label>
-                        <label class="status-filter">
-                            <input type="checkbox" value="rejected" onchange="filterByStatus()">
-                            거부
-                        </label>
-                        <label class="status-filter">
-                            <input type="checkbox" value="revision" onchange="filterByStatus()">
-                            수정요청
-                        </label>
-                        <label class="status-filter">
-                            <input type="checkbox" value="expired" onchange="filterByStatus()">
-                            시간초과
-                        </label>
+                        <div class="status-filter">
+                            <input type="checkbox" id="all" checked onchange="toggleStatusFilter('all')">
+                            <label for="all">전체</label>
+                        </div>
+                        <div class="status-filter">
+                            <input type="checkbox" id="pending" onchange="toggleStatusFilter('pending')">
+                            <label for="pending">대기</label>
+                        </div>
+                        <div class="status-filter">
+                            <input type="checkbox" id="approved" onchange="toggleStatusFilter('approved')">
+                            <label for="approved">승인됨</label>
+                        </div>
+                        <div class="status-filter">
+                            <input type="checkbox" id="closed" onchange="toggleStatusFilter('closed')">
+                            <label for="closed">종료</label>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- 목록 헤더 -->
-        <section class="list-header">
-            <div class="list-title">의뢰서 목록</div>
-            <select class="sort-select" id="sortSelect" onchange="sortRequests()">
-                <option value="date-desc">신청일시 최신순</option>
-                <option value="date-asc">신청일시 오래된순</option>
-                <option value="patient">환자명순</option>
-                <option value="status">상태별</option>
-            </select>
-        </section>
+        <div class="list-header">
+            <div class="result-count" id="resultCount">총 0건</div>
+        </div>
 
         <!-- 의뢰서 목록 -->
-        <section class="requests-list" id="requestsList">
-            <!-- 샘플 의뢰서 1 - 시간초과 임박 -->
-            <div class="request-card status-pending urgent">
-                <div class="request-header">
-                    <div class="patient-info">
-                        <div class="patient-name">김철수</div>
-                        <div class="patient-details">
-                            <span class="patient-type-badge adult">성인</span>
-                            <span class="request-time">2024.01.15 08:30</span>
-                        </div>
-                    </div>
-                    <div class="status-info">
-                        <span class="status-badge pending">대기중</span>
-                        <div class="urgent-warning">⚠️ 2시간 남음</div>
-                    </div>
-                </div>
-                <div class="hospital-info">
-                    <div class="hospital-summary">3개 병원에 전송</div>
-                    <div class="hospital-status">2개 승인, 1개 대기중</div>
-                </div>
-                <div class="request-actions">
-                    <button class="action-btn btn-primary" onclick="viewDetail(1)">상세보기</button>
-                </div>
-            </div>
-
-            <!-- 샘플 의뢰서 2 - 수정요청 -->
-            <div class="request-card status-revision">
-                <div class="request-header">
-                    <div class="patient-info">
-                        <div class="patient-name">박영희</div>
-                        <div class="patient-details">
-                            <span class="patient-type-badge youth">청소년</span>
-                            <span class="request-time">2024.01.14 16:45</span>
-                        </div>
-                    </div>
-                    <div class="status-info">
-                        <span class="status-badge revision">수정요청</span>
-                    </div>
-                </div>
-                <div class="hospital-info">
-                    <div class="hospital-summary">2개 병원에 전송</div>
-                    <div class="hospital-status">1개 수정요청, 1개 거부</div>
-                </div>
-                <div class="request-actions">
-                    <button class="action-btn btn-primary" onclick="viewDetail(2)">상세보기</button>
-                    <button class="action-btn btn-warning" onclick="editRequest(2)">수정</button>
-                </div>
-            </div>
-
-            <!-- 샘플 의뢰서 3 - 승인 완료 -->
-            <div class="request-card status-approved">
-                <div class="request-header">
-                    <div class="patient-info">
-                        <div class="patient-name">이민수</div>
-                        <div class="patient-details">
-                            <span class="patient-type-badge alcohol">알코올</span>
-                            <span class="request-time">2024.01.14 11:20</span>
-                        </div>
-                    </div>
-                    <div class="status-info">
-                        <span class="status-badge approved">승인</span>
-                    </div>
-                </div>
-                <div class="hospital-info">
-                    <div class="hospital-summary">4개 병원에 전송</div>
-                    <div class="hospital-status">평택마음사랑병원에서 승인</div>
-                </div>
-                <div class="request-actions">
-                    <button class="action-btn btn-primary" onclick="viewDetail(3)">상세보기</button>
-                    <button class="action-btn btn-secondary" onclick="downloadRequest(3)">📄 다운로드</button>
-                </div>
-            </div>
-
-            <!-- 샘플 의뢰서 4 - 거부 -->
-            <div class="request-card status-rejected">
-                <div class="request-header">
-                    <div class="patient-info">
-                        <div class="patient-name">정다은</div>
-                        <div class="patient-details">
-                            <span class="patient-type-badge other">기타</span>
-                            <span class="request-time">2024.01.13 14:15</span>
-                        </div>
-                    </div>
-                    <div class="status-info">
-                        <span class="status-badge rejected">거부</span>
-                    </div>
-                </div>
-                <div class="hospital-info">
-                    <div class="hospital-summary">3개 병원에 전송</div>
-                    <div class="hospital-status">3개 모두 거부</div>
-                </div>
-                <div class="request-actions">
-                    <button class="action-btn btn-primary" onclick="viewDetail(4)">상세보기</button>
-                    <button class="action-btn btn-success" onclick="resendRequest(4)">재전송</button>
-                </div>
-            </div>
-
-            <!-- 샘플 의뢰서 5 - 시간초과 -->
-            <div class="request-card status-expired">
-                <div class="request-header">
-                    <div class="patient-info">
-                        <div class="patient-name">최승호</div>
-                        <div class="patient-details">
-                            <span class="patient-type-badge adult">성인</span>
-                            <span class="request-time">2024.01.12 09:30</span>
-                        </div>
-                    </div>
-                    <div class="status-info">
-                        <span class="status-badge expired">시간초과</span>
-                    </div>
-                </div>
-                <div class="hospital-info">
-                    <div class="hospital-summary">5개 병원에 전송</div>
-                    <div class="hospital-status">6시간 경과로 자동 만료</div>
-                </div>
-                <div class="request-actions">
-                    <button class="action-btn btn-primary" onclick="viewDetail(5)">상세보기</button>
-                    <button class="action-btn btn-success" onclick="resendRequest(5)">재전송</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- 빈 상태 (필터 결과가 없을 때) -->
-        <section class="empty-state" id="emptyState" style="display: none;">
-            <div class="empty-icon">📋</div>
-            <div class="empty-title">검색 결과가 없습니다</div>
-            <div class="empty-message">다른 조건으로 검색해보세요</div>
+        <section class="request-list" id="requestList">
+            <!-- 목록이 여기에 동적으로 생성됩니다 -->
         </section>
     </main>
 
+    <!-- 하단 탭바 -->
+    <nav class="bottom-tabs">
+        <button class="tab-item" onclick="switchTab('bed-status')">
+            <div class="tab-icon">🏥</div>
+            <div class="tab-label">병상현황</div>
+        </button>
+        <button class="tab-item active" onclick="switchTab('history')">
+            <div class="tab-icon">📋</div>
+            <div class="tab-label">의뢰 이력</div>
+        </button>
+        <button class="tab-item" onclick="switchTab('mypage')">
+            <div class="tab-icon">👤</div>
+            <div class="tab-label">마이페이지</div>
+        </button>
+    </nav>
+
     <script>
-        // 전역 변수
-        let currentFilter = {
-            period: 'week',
-            status: ['all'],
-            sort: 'date-desc'
-        };
-
-        // 탭 전환
-        function switchTab(tab) {
-            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            switch(tab) {
-                case 'dashboard':
-                    alert('병상현황 페이지로 이동합니다.');
-                    break;
-                case 'history':
-                    // 현재 페이지
-                    break;
-                case 'profile':
-                    alert('마이페이지로 이동합니다.');
-                    break;
+        // 샘플 데이터 - 새로운 상태 체계 적용
+        const referralData = [
+            {
+                id: 1,
+                patientName: "홍길동",
+                patientType: "adult",
+                requestDate: "2024.01.15 14:30",
+                status: "approved", // 의뢰서 상태 (대기/승인됨/종료)
+                hospitalCount: 3,
+                responses: {
+                    approved: 2,
+                    pending: 1,
+                    rejected: 0
+                },
+                hasRevisionRequest: false,
+                urgentHours: null
+            },
+            {
+                id: 2,
+                patientName: "김영희",
+                patientType: "youth",
+                requestDate: "2024.01.14 09:15",
+                status: "pending",
+                hospitalCount: 2,
+                responses: {
+                    approved: 0,
+                    pending: 1,
+                    rejected: 1
+                },
+                hasRevisionRequest: true, // 수정요청 있음
+                urgentHours: null
+            },
+            {
+                id: 3,
+                patientName: "박철수",
+                patientType: "alcohol",
+                requestDate: "2024.01.13 16:45",
+                status: "approved",
+                hospitalCount: 4,
+                responses: {
+                    approved: 1,
+                    pending: 2,
+                    rejected: 1
+                },
+                hasRevisionRequest: false,
+                urgentHours: 2
+            },
+            {
+                id: 4,
+                patientName: "이미영",
+                patientType: "other",
+                requestDate: "2024.01.12 11:20",
+                status: "pending",
+                hospitalCount: 2,
+                responses: {
+                    approved: 0,
+                    pending: 0,
+                    rejected: 2
+                },
+                hasRevisionRequest: false,
+                urgentHours: null
+            },
+            {
+                id: 5,
+                patientName: "정민수",
+                patientType: "adult",
+                requestDate: "2024.01.11 13:10",
+                status: "closed",
+                hospitalCount: 3,
+                responses: {
+                    approved: 1,
+                    pending: 0,
+                    rejected: 2
+                },
+                hasRevisionRequest: false,
+                urgentHours: null
             }
-        }
+        ];
 
-        // 데이터 새로고침
-        function refreshData() {
-            alert('최신 데이터로 업데이트되었습니다.');
-            // 실제로는 API 호출하여 데이터 새로고침
-        }
+        let filteredData = [...referralData];
+        let statusFilters = ['all'];
 
-        // 검색
-        function searchRequests() {
-            const query = prompt('환자명 또는 병원명을 입력하세요:');
-            if (query) {
-                alert(`"${query}"로 검색합니다.`);
-                // 실제로는 검색 결과 필터링
-            }
-        }
+        // 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            renderRequestList();
+            updateResultCount();
+            setupAutoRefresh();
+        });
 
-        // 기간 필터
-        function filterRequests() {
-            currentFilter.period = document.getElementById('periodFilter').value;
-            applyFilters();
-        }
-
-        // 상태 필터
-        function filterByStatus() {
-            const checkboxes = document.querySelectorAll('.status-filter input[type="checkbox"]');
-            const allCheckbox = document.querySelector('.status-filter input[value="all"]');
+        // 의뢰서 목록 렌더링
+        function renderRequestList() {
+            const container = document.getElementById('requestList');
             
-            // "전체" 체크박스 처리
-            if (event.target === allCheckbox) {
-                if (allCheckbox.checked) {
-                    checkboxes.forEach(cb => {
-                        if (cb !== allCheckbox) cb.checked = false;
-                    });
-                    currentFilter.status = ['all'];
+            if (filteredData.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <div class="empty-state-title">아직 작성한 의뢰서가 없습니다</div>
+                        <div class="empty-state-message">새로운 의뢰서를 작성해보세요</div>
+                        <button class="empty-state-action" onclick="createNewRequest()">새 의뢰서 작성하기</button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filteredData.map(referral => {
+                const typeMap = {
+                    adult: '성인',
+                    youth: '청소년',
+                    alcohol: '알코올',
+                    other: '기타'
+                };
+
+                const statusMap = {
+                    pending: '대기',
+                    approved: '승인됨',
+                    closed: '종료'
+                };
+
+                // 처리 현황 텍스트 생성
+                const processStatus = generateProcessStatus(referral.responses);
+
+                // 특별 알림들
+                const specialNotices = [];
+                if (referral.hasRevisionRequest) {
+                    specialNotices.push(`<div class="revision-notice">📝 수정요청 있음</div>`);
                 }
+
+                const noticesHtml = specialNotices.length > 0 ? 
+                    `<div class="special-notices">${specialNotices.join('')}</div>` : '';
+
+                const actionButtons = getActionButtons(referral.status, referral.hasRevisionRequest);
+
+                return `
+                    <div class="request-card">
+                        <div class="status-bar ${referral.status}"></div>
+                        <div class="card-content">
+                            <div class="card-header">
+                                <div class="patient-row">
+                                    <div class="patient-left">
+                                        <div class="patient-name">${referral.patientName}</div>
+                                        <span class="patient-type ${referral.patientType}">${typeMap[referral.patientType]}</span>
+                                    </div>
+                                    <div class="patient-right">
+                                        ${referral.urgentHours ? `<div class="urgent-warning">⚠️ ${referral.urgentHours}시간 남음</div>` : ''}
+                                        <span class="request-date">${referral.requestDate}</span>
+                                    </div>
+                                </div>
+                                <div class="status-row">
+                                    <div class="status-badge ${referral.status}">
+                                        ${statusMap[referral.status]}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="request-details">
+                                <span class="hospital-count">${referral.hospitalCount}개 병원 전송</span> → ${processStatus}
+                            </div>
+                            
+                            ${noticesHtml}
+                            
+                            ${actionButtons ? `<div class="card-actions">${actionButtons}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 처리 현황 텍스트 생성
+        function generateProcessStatus(responses) {
+            const parts = [];
+            if (responses.approved > 0) parts.push(`${responses.approved}개 승인`);
+            if (responses.pending > 0) parts.push(`${responses.pending}개 대기`);
+            if (responses.rejected > 0) parts.push(`${responses.rejected}개 거부`);
+            return parts.join(', ') || '응답 없음';
+        }
+
+        // 상태별 액션 버튼 생성
+        function getActionButtons(status, hasRevisionRequest) {
+            let buttons = '';
+            
+            if (hasRevisionRequest) {
+                buttons += `<button class="action-button btn-edit" onclick="editRequest()">수정</button>`;
+            }
+            
+            return buttons;
+        }
+
+        // 상태 필터 토글
+        function toggleStatusFilter(status) {
+            if (status === 'all') {
+                statusFilters = ['all'];
+                // 모든 체크박스 해제하고 전체만 체크
+                document.querySelectorAll('.status-filter input').forEach(input => {
+                    input.checked = input.id === 'all';
+                });
             } else {
-                // 다른 체크박스 선택 시 "전체" 해제
-                allCheckbox.checked = false;
-                currentFilter.status = Array.from(checkboxes)
-                    .filter(cb => cb.checked && cb.value !== 'all')
-                    .map(cb => cb.value);
+                // 전체 해제
+                document.getElementById('all').checked = false;
                 
-                // 아무것도 선택 안된 경우 "전체" 자동 선택
-                if (currentFilter.status.length === 0) {
-                    allCheckbox.checked = true;
-                    currentFilter.status = ['all'];
+                if (statusFilters.includes('all')) {
+                    statusFilters = [];
+                }
+                
+                if (statusFilters.includes(status)) {
+                    statusFilters = statusFilters.filter(s => s !== status);
+                } else {
+                    statusFilters.push(status);
+                }
+                
+                // 아무것도 선택되지 않았으면 전체 선택
+                if (statusFilters.length === 0) {
+                    statusFilters = ['all'];
+                    document.getElementById('all').checked = true;
                 }
             }
             
-            applyFilters();
-        }
-
-        // 정렬
-        function sortRequests() {
-            currentFilter.sort = document.getElementById('sortSelect').value;
             applyFilters();
         }
 
         // 필터 적용
         function applyFilters() {
-            const requestCards = document.querySelectorAll('.request-card');
-            const emptyState = document.getElementById('emptyState');
-            let visibleCount = 0;
-
-            requestCards.forEach(card => {
-                let showCard = true;
-
-                // 상태 필터 적용
-                if (!currentFilter.status.includes('all')) {
-                    const cardStatus = getCardStatus(card);
-                    if (!currentFilter.status.includes(cardStatus)) {
-                        showCard = false;
-                    }
+            filteredData = referralData.filter(referral => {
+                if (statusFilters.includes('all')) {
+                    return true;
                 }
-
-                if (showCard) {
-                    card.style.display = 'block';
-                    visibleCount++;
-                } else {
-                    card.style.display = 'none';
-                }
+                return statusFilters.includes(referral.status);
             });
-
-            // 빈 상태 표시
-            if (visibleCount === 0) {
-                emptyState.style.display = 'block';
-            } else {
-                emptyState.style.display = 'none';
-            }
-        }
-
-        // 카드 상태 추출
-        function getCardStatus(card) {
-            if (card.classList.contains('status-pending')) return 'pending';
-            if (card.classList.contains('status-approved')) return 'approved';
-            if (card.classList.contains('status-rejected')) return 'rejected';
-            if (card.classList.contains('status-revision')) return 'revision';
-            if (card.classList.contains('status-expired')) return 'expired';
-            return 'pending';
-        }
-
-        // 상세보기
-        function viewDetail(requestId) {
-            alert(`의뢰서 ${requestId}번 상세 페이지로 이동합니다.`);
-            // 실제로는 window.location.href = `/police/request/${requestId}`;
-        }
-
-        // 의뢰서 수정
-        function editRequest(requestId) {
-            alert(`의뢰서 ${requestId}번을 수정합니다.\n\n의뢰서 작성 페이지로 이동하여 기존 데이터를 불러옵니다.`);
-            // 실제로는 window.location.href = `/police/request-form?edit=${requestId}`;
-        }
-
-        // 재전송
-        function resendRequest(requestId) {
-            const confirmed = confirm(`의뢰서 ${requestId}번을 다시 전송하시겠습니까?\n\n새로운 병원을 선택하여 재전송할 수 있습니다.`);
-            if (confirmed) {
-                alert('병원 선택 페이지로 이동합니다.');
-                // 실제로는 window.location.href = `/police/hospital-selection?resend=${requestId}`;
-            }
-        }
-
-        // 다운로드
-        function downloadRequest(requestId) {
-            alert(`의뢰서 ${requestId}번을 PDF로 다운로드합니다.`);
-            // 실제로는 PDF 생성 및 다운로드
-        }
-
-        // 초기화
-        document.addEventListener('DOMContentLoaded', function() {
-            // 초기 필터 적용
-            applyFilters();
             
-            // 시간초과 임박 항목 강조 (시뮬레이션)
+            renderRequestList();
+            updateResultCount();
+        }
+
+        // 정렬 함수 제거
+
+        // 결과 수 업데이트
+        function updateResultCount() {
+            document.getElementById('resultCount').textContent = `총 ${filteredData.length}건`;
+        }
+
+        // 자동 새로고침 (30초마다)
+        function setupAutoRefresh() {
             setInterval(() => {
-                const urgentCards = document.querySelectorAll('.request-card.urgent');
-                urgentCards.forEach(card => {
-                    const warning = card.querySelector('.urgent-warning');
-                    if (warning) {
-                        // 남은 시간 업데이트 시뮬레이션
-                        const currentText = warning.textContent;
-                        if (currentText.includes('2시간')) {
-                            warning.textContent = '⚠️ 1시간 55분 남음';
-                        }
-                    }
-                });
-            }, 60000); // 1분마다 업데이트
-        });
+                // 실제로는 서버에서 최신 데이터 조회
+                console.log('자동 새로고침 중...');
+            }, 30000);
+        }
+
+        // 액션 함수들
+        function refreshData() {
+            alert('데이터를 새로고침합니다.');
+            // 실제로는 서버에서 최신 데이터 조회
+        }
+
+        function openSearch() {
+            const keyword = prompt('환자명 또는 병원명을 입력하세요:');
+            if (keyword) {
+                alert(`"${keyword}" 검색 결과`);
+                // 실제로는 검색 기능 구현
+            }
+        }
+
+        function viewDetail() {
+            alert('의뢰서 상세 페이지로 이동합니다.');
+        }
+
+        function editRequest() {
+            alert('의뢰서 수정 페이지로 이동합니다.');
+        }
+
+        function createNewRequest() {
+            alert('새 의뢰서 작성 페이지로 이동합니다.');
+        }
+
+        // 탭 전환
+        function switchTab(tabName) {
+            if (tabName === 'bed-status') {
+                alert('병상현황 페이지로 이동합니다.');
+            } else if (tabName === 'mypage') {
+                alert('마이페이지로 이동합니다.');
+            }
+        }
     </script>
 </body>
 </html>
