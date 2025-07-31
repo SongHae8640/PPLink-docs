@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>병원 로그인 - 정신병원입원 의뢰 시스템</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            color: #1f2937;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .system-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1B365D;
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        .role-badge {
+            display: inline-block;
+            background: #0EA5E9;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 24px;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .required {
+            color: #DC2626;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #0EA5E9;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+        }
+
+        .form-input.error {
+            border-color: #DC2626;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin: 24px 0;
+        }
+
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            accent-color: #0EA5E9;
+        }
+
+        .checkbox-label {
+            font-size: 14px;
+            color: #6B7280;
+            cursor: pointer;
+        }
+
+        .login-button {
+            width: 100%;
+            background: #0EA5E9;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-bottom: 24px;
+        }
+
+        .login-button:hover {
+            background: #0284c7;
+        }
+
+        .login-button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .login-button.loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .login-button.loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #DC2626;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+
+
+        .links-section {
+            border-top: 1px solid #e5e7eb;
+            padding-top: 24px;
+            text-align: center;
+        }
+
+        .auth-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .link {
+            color: #0EA5E9;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .link:hover {
+            color: #0284c7;
+            text-decoration: underline;
+        }
+
+        .signup-link {
+            font-weight: 500;
+        }
+
+        .help-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        .help-link {
+            color: #6B7280;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .help-link:hover {
+            color: #374151;
+        }
+
+
+
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 24px;
+                margin: 10px;
+            }
+            
+            .system-title {
+                font-size: 24px;
+            }
+            
+            .help-links {
+                flex-direction: column;
+                gap: 8px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="login-card">
+            <div class="header">
+                <h1 class="system-title">정신병원입원 의뢰시스템</h1>
+                <span class="role-badge">병원 직원용</span>
+            </div>
+
+
+
+            <div class="error-message" id="errorMessage">
+                아이디 또는 비밀번호가 올바르지 않습니다.
+            </div>
+
+
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="username">
+                        아이디 <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        class="form-input"
+                        placeholder="아이디를 입력하세요"
+                        autocomplete="username"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">
+                        비밀번호 <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        class="form-input"
+                        placeholder="비밀번호를 입력하세요"
+                        autocomplete="current-password"
+                        required
+                    >
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="keepLogin" name="keepLogin" class="checkbox">
+                    <label for="keepLogin" class="checkbox-label">로그인 상태 유지</label>
+                </div>
+
+                <button type="submit" class="login-button" id="loginButton">
+                    로그인
+                </button>
+            </form>
+
+            <div class="links-section">
+                <div class="auth-links">
+                    <a href="#" class="link signup-link" onclick="goToSignup()">계정이 없으신가요? 회원가입</a>
+                    <div>
+                        <a href="#" class="link" onclick="goToFindId()">아이디 찾기</a>
+                        <span style="color: #e5e7eb; margin: 0 8px;">|</span>
+                        <a href="#" class="link" onclick="goToFindPassword()">비밀번호 찾기</a>
+                    </div>
+                </div>
+
+                <div class="help-links">
+                    <a href="#" class="help-link" onclick="goBack()">← 뒤로가기</a>
+                    <a href="#" class="help-link" onclick="showHelp()">도움말</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const loginButton = document.getElementById('loginButton');
+        const errorMessage = document.getElementById('errorMessage');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+
+        // 폼 제출 처리
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // 입력값 검증
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+            
+            // 오류 상태 초기화
+            errorMessage.classList.remove('show');
+            usernameInput.classList.remove('error');
+            passwordInput.classList.remove('error');
+            
+            if (!username) {
+                usernameInput.classList.add('error');
+                usernameInput.focus();
+                return;
+            }
+            
+            if (!password) {
+                passwordInput.classList.add('error');
+                passwordInput.focus();
+                return;
+            }
+            
+            // 로딩 상태 시작
+            loginButton.disabled = true;
+            loginButton.classList.add('loading');
+            
+            try {
+                // 실제 구현에서는 여기서 API 호출
+                await new Promise(resolve => setTimeout(resolve, 1500)); // 시뮬레이션
+                
+                // 로그인 성공 시뮬레이션 (실제로는 서버 응답에 따라 처리)
+                if (username === 'hospital001' && password === 'demo') {
+                    alert('로그인 성공! 병원 대시보드로 이동합니다.');
+                    // 실제로는 location.href = '/hospital/dashboard' 등으로 리다이렉트
+                } else {
+                    // 로그인 실패
+                    errorMessage.classList.add('show');
+                    usernameInput.focus();
+                }
+                
+            } catch (error) {
+                errorMessage.textContent = '로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+                errorMessage.classList.add('show');
+            } finally {
+                // 로딩 상태 종료
+                loginButton.disabled = false;
+                loginButton.classList.remove('loading');
+            }
+        });
+
+        // 입력 시 오류 상태 제거
+        usernameInput.addEventListener('input', () => {
+            usernameInput.classList.remove('error');
+            errorMessage.classList.remove('show');
+        });
+
+        passwordInput.addEventListener('input', () => {
+            passwordInput.classList.remove('error');
+            errorMessage.classList.remove('show');
+        });
+
+        // 엔터키 처리
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !loginButton.disabled) {
+                loginForm.dispatchEvent(new Event('submit'));
+            }
+        });
+
+        // 네비게이션 함수들
+        function goToSignup() {
+            alert('병원 직원 회원가입 페이지로 이동합니다.');
+            // 실제로는 location.href = '/hospital/signup';
+        }
+
+        function goToFindId() {
+            alert('아이디 찾기 페이지로 이동합니다.');
+            // 실제로는 location.href = '/hospital/find-id';
+        }
+
+        function goToFindPassword() {
+            alert('비밀번호 찾기 페이지로 이동합니다.');
+            // 실제로는 location.href = '/hospital/find-password';
+        }
+
+        function goBack() {
+            if (confirm('역할 선택 페이지로 돌아가시겠습니까?')) {
+                alert('역할 선택 페이지로 이동합니다.');
+                // 실제로는 location.href = '/';
+            }
+        }
+
+        function showHelp() {
+            alert('도움말:\n\n1. 병원 직원만 로그인 가능합니다.\n2. 회원가입은 관리자 승인이 필요합니다.\n3. 로그인 문제 시 관리자에게 문의하세요.\n\n문의: admin@example.com');
+        }
+    </script>
+</body>
+</html>
