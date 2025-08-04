@@ -241,19 +241,24 @@
             display: inline-block;
         }
 
-        .patient-type.adult {
+        .patient-type.adult-male {
             background: #eff6ff;
             color: #2563EB;
         }
 
-        .patient-type.youth {
+        .patient-type.adult-female {
+            background: #fdf2f8;
+            color: #be185d;
+        }
+
+        .patient-type.youth-male {
             background: #f0fdf4;
             color: #059669;
         }
 
-        .patient-type.alcohol {
-            background: #fef3c7;
-            color: #d97706;
+        .patient-type.youth-female {
+            background: #ecfdf5;
+            color: #047857;
         }
 
         .patient-type.other {
@@ -631,7 +636,7 @@
                 <div class="info-row">
                     <div class="info-item">
                         <span class="info-label">환자구분</span>
-                        <span class="patient-type adult" id="patientType">성인</span>
+                        <span class="patient-type adult-male" id="patientType">성인남</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">신장/체중</span>
@@ -710,7 +715,16 @@
     </div>
 
     <script>
-        // 샘플 데이터
+        // 환자 분류 / 병상 분류 정의
+        const bedCategories = {
+            'adult-male': '성인남',
+            'adult-female': '성인여',
+            'youth-male': '청소년남',
+            'youth-female': '청소년여',
+            'other': '기타'
+        };
+
+        // 샘플 데이터 - 5가지 분류 체계 적용
         const referralData = {
             id: 1,
             number: "REF-2024-001",
@@ -720,7 +734,7 @@
                 name: "홍○○",
                 gender: "남성",
                 age: 45,
-                type: "adult",
+                type: "adult-male", // adult-male, adult-female, youth-male, youth-female, other
                 height: 170,
                 weight: 70,
                 guardian: {
@@ -744,8 +758,8 @@
                     phone: "02-2072-2972",
                     status: "approved",
                     responseTime: "2시간 전 응답",
-                    content: "입원 가능합니다. 성인 병동에 병상이 확보되어 있습니다.",
-                    bedInfo: "성인 병상 11/20 사용중"
+                    content: "입원 가능합니다. 성인남 병동에 병상이 확보되어 있습니다.",
+                    bedInfo: "성인남 병상 6/10 사용중"
                 },
                 {
                     id: 2,
@@ -754,8 +768,8 @@
                     phone: "02-3410-2000",
                     status: "rejected",
                     responseTime: "1시간 전 응답",
-                    content: "현재 병상이 모두 차있어 입원이 어렵습니다.",
-                    bedInfo: "성인 병상 20/20 사용중"
+                    content: "현재 성인남 병상이 모두 차있어 입원이 어렵습니다.",
+                    bedInfo: "성인남 병상 10/10 사용중"
                 },
                 {
                     id: 3,
@@ -765,7 +779,7 @@
                     status: "pending",
                     responseTime: "아직 응답 없음",
                     content: "",
-                    bedInfo: "성인 병상 15/20 사용중"
+                    bedInfo: "성인남 병상 7/10 사용중"
                 }
             ],
             hasRevisionRequest: false,
@@ -838,16 +852,10 @@
         // 환자 정보 업데이트
         function updatePatientInfo() {
             const patient = referralData.patient;
-            const typeMap = {
-                adult: '성인',
-                youth: '청소년',
-                alcohol: '알코올',
-                other: '기타'
-            };
             
             document.getElementById('patientName').textContent = patient.name;
             document.getElementById('patientGenderAge').textContent = `${patient.gender}, ${patient.age}세`;
-            document.getElementById('patientType').textContent = typeMap[patient.type];
+            document.getElementById('patientType').textContent = bedCategories[patient.type];
             document.getElementById('patientType').className = `patient-type ${patient.type}`;
             document.getElementById('patientPhysical').textContent = `${patient.height}cm, ${patient.weight}kg`;
             document.getElementById('guardian').innerHTML = 
@@ -862,185 +870,4 @@
                 `${officer.department} ${officer.rank} ${officer.name}`;
         }
 
-        // 병원 응답 렌더링
-        function renderHospitalResponses() {
-            const container = document.getElementById('hospitalResponses');
-            
-            const statusMap = {
-                pending: { text: '검토 중', class: 'pending' },
-                approved: { text: '입원 가능', class: 'approved' },
-                rejected: { text: '입원 불가', class: 'rejected' }
-            };
-            
-            container.innerHTML = referralData.hospitals.map(hospital => {
-                const status = statusMap[hospital.status];
-                
-                return `
-                    <div class="hospital-response-card ${hospital.status}">
-                        <div class="hospital-header">
-                            <div class="hospital-info">
-                                <div class="hospital-name">${hospital.name}</div>
-                                <div class="hospital-details">
-                                    📍 ${hospital.distance} · 📞 <a href="tel:${hospital.phone}" class="phone-link">${hospital.phone}</a>
-                                </div>
-                            </div>
-                            <span class="response-status ${hospital.status}">${status.text}</span>
-                        </div>
-                        <div class="response-time">${hospital.responseTime}</div>
-                        ${hospital.content ? `<div class="response-content">${hospital.content}</div>` : ''}
-                        <div class="bed-info">${hospital.bedInfo}</div>
-                        ${hospital.status === 'approved' ? 
-                            `<div class="hospital-action">
-                                <button class="hospital-button" onclick="processAdmissionToHospital(${hospital.id})">입원 처리</button>
-                            </div>` : ''
-                        }
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // 수정요청 표시
-        function showRevisionRequest() {
-            const section = document.getElementById('revisionSection');
-            section.style.display = 'block';
-        }
-
-        // 타임라인 렌더링
-        function renderTimeline() {
-            const container = document.getElementById('timeline');
-            
-            container.innerHTML = referralData.timeline.map(item => `
-                <div class="timeline-item">
-                    <div class="timeline-time">${item.time}</div>
-                    <div class="timeline-content">${item.content}</div>
-                </div>
-            `).join('');
-        }
-
-        // 액션 버튼 렌더링
-        function renderActionButtons() {
-            const container = document.querySelector('.actions-content');
-            
-            if (referralData.status === 'closed') {
-                // 종료 상태일 때는 액션 버튼 없음
-                document.getElementById('bottomActions').style.display = 'none';
-                return;
-            }
-            
-            let buttons = '';
-            
-            if (referralData.status === 'pending') {
-                if (referralData.hasRevisionRequest) {
-                    buttons += `<button class="action-button btn-warning" onclick="editRequest()">수정하기</button>`;
-                }
-                buttons += `<button class="action-button btn-secondary" onclick="closeRequest()">종료하기</button>`;
-            } else if (referralData.status === 'approved') {
-                buttons += `<button class="action-button btn-secondary" onclick="closeRequest()">종료하기</button>`;
-            }
-            
-            container.innerHTML = buttons;
-        }
-
-        // 자동 새로고침 (30초마다)
-        function setupAutoRefresh() {
-            setInterval(() => {
-                // 실제로는 서버에서 최신 데이터 조회
-                console.log('자동 새로고침 중...');
-                // updateReferralData();
-            }, 30000);
-        }
-
-        // 사진 확대 보기
-        function enlargePhoto(index) {
-            alert(`사진 ${index + 1} 확대 보기`);
-            // 실제로는 모달로 사진 확대 표시
-        }
-
-        // 액션 함수들
-        function goBack() {
-            if (confirm('의뢰서 상세 페이지를 나가시겠습니까?')) {
-                history.back();
-            }
-        }
-
-        function downloadPDF() {
-            alert('PDF 다운로드를 시작합니다.');
-            // 실제로는 서버에서 PDF 생성 후 다운로드
-        }
-
-        function editRequest() {
-            if (confirm('의뢰서를 수정하시겠습니까?')) {
-                alert('의뢰서 수정 페이지로 이동합니다.');
-                // 실제로는 수정 페이지로 이동
-            }
-        }
-
-        function processAdmission() {
-            const approvedHospitals = referralData.hospitals.filter(h => h.status === 'approved');
-            
-            if (approvedHospitals.length === 0) {
-                alert('승인된 병원이 없습니다.');
-                return;
-            }
-            
-            if (approvedHospitals.length === 1) {
-                if (confirm(`${approvedHospitals[0].name}으로 입원 처리하시겠습니까?`)) {
-                    alert('입원 처리가 완료되었습니다.');
-                    // 실제로는 서버에 입원 처리 요청
-                }
-            } else {
-                // 여러 병원이 승인한 경우 선택 모달 표시
-                showHospitalSelectionModal(approvedHospitals);
-            }
-        }
-
-        function processAdmissionToHospital(hospitalId) {
-            const hospital = referralData.hospitals.find(h => h.id === hospitalId);
-            
-            if (!hospital || hospital.status !== 'approved') {
-                alert('입원 처리할 수 없는 병원입니다.');
-                return;
-            }
-            
-            if (confirm(`${hospital.name}으로 입원 처리하시겠습니까?\n\n입원 처리 후에는 취소할 수 없습니다.`)) {
-                alert(`${hospital.name} 입원 처리가 완료되었습니다.`);
-                // 실제로는 서버에 입원 처리 요청
-                // 성공 시 페이지 새로고침 또는 상태 업데이트
-            }
-        }
-
-        function showHospitalSelectionModal(hospitals) {
-            const hospitalList = hospitals.map(h => h.name).join('\n');
-            const selected = prompt(`입원할 병원을 선택하세요:\n\n${hospitalList}\n\n병원명을 입력하세요:`);
-            
-            const selectedHospital = hospitals.find(h => h.name === selected);
-            if (selectedHospital) {
-                if (confirm(`${selectedHospital.name}으로 입원 처리하시겠습니까?`)) {
-                    alert('입원 처리가 완료되었습니다.');
-                    // 실제로는 서버에 입원 처리 요청
-                }
-            } else {
-                alert('올바른 병원명을 입력하세요.');
-            }
-        }
-
-        function closeRequest() {
-            const reason = prompt('종료 사유를 입력하세요:');
-            if (reason) {
-                if (confirm('정말로 의뢰를 종료하시겠습니까?')) {
-                    alert('의뢰가 종료되었습니다.');
-                    // 실제로는 서버에 종료 처리 요청
-                }
-            }
-        }
-
-        // 사진 클릭 이벤트 설정
-        document.addEventListener('DOMContentLoaded', function() {
-            const photoItems = document.querySelectorAll('.photo-item');
-            photoItems.forEach((item, index) => {
-                item.addEventListener('click', () => enlargePhoto(index));
-            });
-        });
-    </script>
-</body>
-</html>
+        // 병원 응

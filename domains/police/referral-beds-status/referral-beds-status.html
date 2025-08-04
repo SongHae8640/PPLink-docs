@@ -204,26 +204,27 @@
 
         .bed-status-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
             margin-bottom: 16px;
         }
 
         .bed-status-item {
             text-align: center;
-            padding: 12px 8px;
+            padding: 10px 6px;
             border-radius: 8px;
             background: #f9fafb;
         }
 
         .bed-type {
-            font-size: 12px;
+            font-size: 11px;
             color: #6B7280;
             margin-bottom: 4px;
+            font-weight: 500;
         }
 
         .bed-count {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 700;
         }
 
@@ -366,7 +367,20 @@
             }
 
             .bed-status-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+            }
+
+            .bed-status-item {
+                padding: 8px 4px;
+            }
+
+            .bed-type {
+                font-size: 10px;
+            }
+
+            .bed-count {
+                font-size: 12px;
             }
 
             .hospital-header {
@@ -392,6 +406,17 @@
                 width: 48px;
                 height: 48px;
                 font-size: 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .bed-status-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .bed-status-item {
+                padding: 8px 6px;
             }
         }
     </style>
@@ -452,7 +477,16 @@
     </nav>
 
     <script>
-        // 샘플 데이터
+        // 병상 분류 정의
+        const bedCategories = {
+            'adult-male': '성인남',
+            'adult-female': '성인여',
+            'youth-male': '청소년남',
+            'youth-female': '청소년여',
+            'other': '기타'
+        };
+
+        // 샘플 데이터 - 5가지 분류 체계 적용
         const hospitalData = [
             {
                 id: 1,
@@ -461,10 +495,11 @@
                 phone: "02-2072-2972",
                 nightAvailable: true,
                 beds: {
-                    adult: { used: 9, total: 20 },
-                    youth: { used: 0, total: 10 },
-                    alcohol: { used: 7, total: 10 },
-                    other: { used: 2, total: 5 }
+                    'adult-male': { used: 5, total: 10 },
+                    'adult-female': { used: 4, total: 10 },
+                    'youth-male': { used: 0, total: 5 },
+                    'youth-female': { used: 0, total: 5 },
+                    'other': { used: 2, total: 5 }
                 }
             },
             {
@@ -474,10 +509,11 @@
                 phone: "02-3410-2000",
                 nightAvailable: false,
                 beds: {
-                    adult: { used: 18, total: 20 },
-                    youth: { used: 8, total: 10 },
-                    alcohol: { used: 10, total: 10 },
-                    other: { used: 4, total: 5 }
+                    'adult-male': { used: 9, total: 10 },
+                    'adult-female': { used: 9, total: 10 },
+                    'youth-male': { used: 4, total: 5 },
+                    'youth-female': { used: 4, total: 5 },
+                    'other': { used: 4, total: 5 }
                 }
             },
             {
@@ -487,10 +523,11 @@
                 phone: "02-2019-3000",
                 nightAvailable: true,
                 beds: {
-                    adult: { used: 15, total: 20 },
-                    youth: { used: 3, total: 10 },
-                    alcohol: { used: 6, total: 10 },
-                    other: { used: 1, total: 5 }
+                    'adult-male': { used: 7, total: 10 },
+                    'adult-female': { used: 8, total: 10 },
+                    'youth-male': { used: 1, total: 5 },
+                    'youth-female': { used: 2, total: 5 },
+                    'other': { used: 1, total: 5 }
                 }
             },
             {
@@ -500,10 +537,11 @@
                 phone: "02-3010-3000",
                 nightAvailable: true,
                 beds: {
-                    adult: { used: 20, total: 20 },
-                    youth: { used: 10, total: 10 },
-                    alcohol: { used: 8, total: 10 },
-                    other: { used: 5, total: 5 }
+                    'adult-male': { used: 10, total: 10 },
+                    'adult-female': { used: 10, total: 10 },
+                    'youth-male': { used: 5, total: 5 },
+                    'youth-female': { used: 5, total: 5 },
+                    'other': { used: 5, total: 5 }
                 }
             }
         ];
@@ -591,30 +629,14 @@
                     </div>
 
                     <div class="bed-status-grid">
-                        <div class="bed-status-item">
-                            <div class="bed-type">성인</div>
-                            <div class="bed-count ${getBedStatusClass(hospital.beds.adult.used, hospital.beds.adult.total)}">
-                                ${hospital.beds.adult.used}/${hospital.beds.adult.total}
+                        ${Object.entries(bedCategories).map(([key, label]) => `
+                            <div class="bed-status-item">
+                                <div class="bed-type">${label}</div>
+                                <div class="bed-count ${getBedStatusClass(hospital.beds[key].used, hospital.beds[key].total)}">
+                                    ${hospital.beds[key].used}/${hospital.beds[key].total}
+                                </div>
                             </div>
-                        </div>
-                        <div class="bed-status-item">
-                            <div class="bed-type">청소년</div>
-                            <div class="bed-count ${getBedStatusClass(hospital.beds.youth.used, hospital.beds.youth.total)}">
-                                ${hospital.beds.youth.used}/${hospital.beds.youth.total}
-                            </div>
-                        </div>
-                        <div class="bed-status-item">
-                            <div class="bed-type">알코올</div>
-                            <div class="bed-count ${getBedStatusClass(hospital.beds.alcohol.used, hospital.beds.alcohol.total)}">
-                                ${hospital.beds.alcohol.used}/${hospital.beds.alcohol.total}
-                            </div>
-                        </div>
-                        <div class="bed-status-item">
-                            <div class="bed-type">기타</div>
-                            <div class="bed-count ${getBedStatusClass(hospital.beds.other.used, hospital.beds.other.total)}">
-                                ${hospital.beds.other.used}/${hospital.beds.other.total}
-                            </div>
-                        </div>
+                        `).join('')}
                     </div>
 
                     <button class="request-button" onclick="event.stopPropagation(); createRequestToHospital(${hospital.id})">
@@ -659,7 +681,12 @@
         // 병원 상세 정보 표시
         function showHospitalDetail(hospitalId) {
             const hospital = hospitalData.find(h => h.id === hospitalId);
-            alert(`${hospital.name} 상세 정보\n\n주소: ${hospital.address}\n전화: ${hospital.phone}\n야간진료: ${hospital.nightAvailable ? '가능' : '불가능'}`);
+            let bedInfo = Object.entries(bedCategories).map(([key, label]) => {
+                const bed = hospital.beds[key];
+                return `${label}: ${bed.used}/${bed.total}`;
+            }).join('\n');
+            
+            alert(`${hospital.name} 상세 정보\n\n주소: ${hospital.address}\n전화: ${hospital.phone}\n야간진료: ${hospital.nightAvailable ? '가능' : '불가능'}\n\n병상현황:\n${bedInfo}`);
         }
 
         // 특정 병원으로 의뢰서 작성

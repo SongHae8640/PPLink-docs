@@ -270,19 +270,24 @@
             font-weight: 500;
         }
 
-        .patient-type.adult {
+        .patient-type.adult-male {
             background: #eff6ff;
             color: #2563EB;
         }
 
-        .patient-type.youth {
+        .patient-type.adult-female {
+            background: #fdf2f8;
+            color: #be185d;
+        }
+
+        .patient-type.youth-male {
             background: #f0fdf4;
             color: #059669;
         }
 
-        .patient-type.alcohol {
-            background: #fef3c7;
-            color: #d97706;
+        .patient-type.youth-female {
+            background: #ecfdf5;
+            color: #047857;
         }
 
         .patient-type.other {
@@ -610,12 +615,21 @@
     </nav>
 
     <script>
-        // 샘플 데이터 - 새로운 상태 체계 적용
+        // 환자 분류 / 병상 분류 정의
+        const bedCategories = {
+            'adult-male': '성인남',
+            'adult-female': '성인여',
+            'youth-male': '청소년남',
+            'youth-female': '청소년여',
+            'other': '기타'
+        };
+
+        // 샘플 데이터 - 5가지 분류 체계 적용
         const referralData = [
             {
                 id: 1,
                 patientName: "홍길동",
-                patientType: "adult",
+                patientType: "adult-male",
                 requestDate: "2024.01.15 14:30",
                 status: "approved", // 의뢰서 상태 (대기/승인됨/종료)
                 hospitalCount: 3,
@@ -630,7 +644,7 @@
             {
                 id: 2,
                 patientName: "김영희",
-                patientType: "youth",
+                patientType: "youth-female",
                 requestDate: "2024.01.14 09:15",
                 status: "pending",
                 hospitalCount: 2,
@@ -645,7 +659,7 @@
             {
                 id: 3,
                 patientName: "박철수",
-                patientType: "alcohol",
+                patientType: "other",
                 requestDate: "2024.01.13 16:45",
                 status: "approved",
                 hospitalCount: 4,
@@ -660,7 +674,7 @@
             {
                 id: 4,
                 patientName: "이미영",
-                patientType: "other",
+                patientType: "adult-female",
                 requestDate: "2024.01.12 11:20",
                 status: "pending",
                 hospitalCount: 2,
@@ -675,7 +689,7 @@
             {
                 id: 5,
                 patientName: "정민수",
-                patientType: "adult",
+                patientType: "youth-male",
                 requestDate: "2024.01.11 13:10",
                 status: "closed",
                 hospitalCount: 3,
@@ -716,13 +730,6 @@
             }
 
             container.innerHTML = filteredData.map(referral => {
-                const typeMap = {
-                    adult: '성인',
-                    youth: '청소년',
-                    alcohol: '알코올',
-                    other: '기타'
-                };
-
                 const statusMap = {
                     pending: '대기',
                     approved: '승인됨',
@@ -751,7 +758,7 @@
                                 <div class="patient-row">
                                     <div class="patient-left">
                                         <div class="patient-name">${referral.patientName}</div>
-                                        <span class="patient-type ${referral.patientType}">${typeMap[referral.patientType]}</span>
+                                        <span class="patient-type ${referral.patientType}">${bedCategories[referral.patientType]}</span>
                                     </div>
                                     <div class="patient-right">
                                         ${referral.urgentHours ? `<div class="urgent-warning">⚠️ ${referral.urgentHours}시간 남음</div>` : ''}
@@ -842,8 +849,6 @@
             renderRequestList();
             updateResultCount();
         }
-
-        // 정렬 함수 제거
 
         // 결과 수 업데이트
         function updateResultCount() {

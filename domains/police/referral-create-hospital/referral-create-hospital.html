@@ -407,15 +407,6 @@
             color: #D1D5DB;
         }
 
-        .status-indicator {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            flex-shrink: 0;
-            margin-top: 4px;
-            display: none; /* 세미카드 안으로 이동했으므로 숨김 */
-        }
-
         /* 하단 액션 */
         .bottom-actions {
             position: fixed;
@@ -518,10 +509,6 @@
             }
 
             .bed-status {
-                flex-wrap: wrap;
-            }
-
-            .bed-status {
                 flex-direction: column;
                 align-items: stretch;
                 gap: 8px;
@@ -541,12 +528,6 @@
             .other-beds {
                 font-size: 10px;
                 padding-top: 0;
-            }
-
-            .status-indicator {
-                align-self: flex-end;
-                margin-top: -20px;
-                display: none; /* 모바일에서도 숨김 */
             }
 
             .actions-content {
@@ -580,7 +561,7 @@
                 <button class="check-request-btn" onclick="checkRequest()">의뢰서 확인</button>
             </div>
             <div class="patient-info" id="patientSummary">
-                홍길동 (남, 45세) - 성인
+                홍길동 (남, 45세) - 성인남
             </div>
         </section>
 
@@ -638,7 +619,16 @@
     </div>
 
     <script>
-        // 샘플 데이터
+        // 환자 분류 / 병상 분류 정의
+        const bedCategories = {
+            'adult-male': '성인남',
+            'adult-female': '성인여',
+            'youth-male': '청소년남',
+            'youth-female': '청소년여',
+            'other': '기타'
+        };
+
+        // 샘플 데이터 - 5가지 분류 체계 적용
         const hospitalData = [
             {
                 id: 1,
@@ -648,10 +638,11 @@
                 distance: 1.2,
                 nightAvailable: true,
                 beds: {
-                    adult: { used: 9, total: 20 },
-                    youth: { used: 0, total: 10 },
-                    alcohol: { used: 7, total: 10 },
-                    other: { used: 2, total: 5 }
+                    'adult-male': { used: 5, total: 10 },
+                    'adult-female': { used: 4, total: 10 },
+                    'youth-male': { used: 0, total: 5 },
+                    'youth-female': { used: 0, total: 5 },
+                    'other': { used: 2, total: 5 }
                 }
             },
             {
@@ -662,10 +653,11 @@
                 distance: 2.5,
                 nightAvailable: false,
                 beds: {
-                    adult: { used: 18, total: 20 },
-                    youth: { used: 8, total: 10 },
-                    alcohol: { used: 10, total: 10 },
-                    other: { used: 4, total: 5 }
+                    'adult-male': { used: 9, total: 10 },
+                    'adult-female': { used: 9, total: 10 },
+                    'youth-male': { used: 4, total: 5 },
+                    'youth-female': { used: 4, total: 5 },
+                    'other': { used: 4, total: 5 }
                 }
             },
             {
@@ -676,10 +668,11 @@
                 distance: 0.8,
                 nightAvailable: true,
                 beds: {
-                    adult: { used: 15, total: 20 },
-                    youth: { used: 3, total: 10 },
-                    alcohol: { used: 6, total: 10 },
-                    other: { used: 1, total: 5 }
+                    'adult-male': { used: 7, total: 10 },
+                    'adult-female': { used: 8, total: 10 },
+                    'youth-male': { used: 1, total: 5 },
+                    'youth-female': { used: 2, total: 5 },
+                    'other': { used: 1, total: 5 }
                 }
             },
             {
@@ -690,10 +683,11 @@
                 distance: 3.1,
                 nightAvailable: true,
                 beds: {
-                    adult: { used: 20, total: 20 },
-                    youth: { used: 10, total: 10 },
-                    alcohol: { used: 8, total: 10 },
-                    other: { used: 5, total: 5 }
+                    'adult-male': { used: 10, total: 10 },
+                    'adult-female': { used: 10, total: 10 },
+                    'youth-male': { used: 5, total: 5 },
+                    'youth-female': { used: 5, total: 5 },
+                    'other': { used: 5, total: 5 }
                 }
             }
         ];
@@ -703,7 +697,7 @@
             name: "홍길동",
             gender: "남",
             age: 45,
-            type: "adult" // adult, youth, alcohol, other
+            type: "adult-male" // adult-male, adult-female, youth-male, youth-female, other
         };
 
         let isNightFilter = false;
@@ -730,13 +724,7 @@
         // 환자 요약 정보 업데이트
         function updatePatientSummary() {
             const summary = document.getElementById('patientSummary');
-            const typeMap = {
-                adult: '성인',
-                youth: '청소년', 
-                alcohol: '알코올',
-                other: '기타'
-            };
-            summary.textContent = `${patientInfo.name} (${patientInfo.gender}, ${patientInfo.age}세) - ${typeMap[patientInfo.type]}`;
+            summary.textContent = `${patientInfo.name} (${patientInfo.gender}, ${patientInfo.age}세) - ${bedCategories[patientInfo.type]}`;
         }
 
         // 토글 설정
@@ -814,13 +802,6 @@
                 const statusClass = getBedStatusClass(primaryBed.used, primaryBed.total);
                 const isSelected = selectedHospitals.has(hospital.id);
 
-                const otherBeds = Object.entries(hospital.beds)
-                    .filter(([type]) => type !== patientInfo.type)
-                    .map(([type, bed]) => {
-                        const typeMap = { adult: '성인', youth: '청소년', alcohol: '알코올', other: '기타' };
-                        return `${typeMap[type]} ${bed.used}/${bed.total}`;
-                    }).join(' • ');
-
                 return `
                     <div class="hospital-card ${isSelected ? 'selected' : ''}" onclick="toggleHospital(${hospital.id})">
                         <div class="hospital-header">
@@ -843,19 +824,15 @@
                             <div class="primary-bed ${statusClass}">
                                 <div class="bed-info-line">
                                     <div class="status-dot ${statusClass}"></div>
-                                    <span class="bed-text">${patientInfo.type === 'adult' ? '성인' : 
-                                                          patientInfo.type === 'youth' ? '청소년' : 
-                                                          patientInfo.type === 'alcohol' ? '알코올' : '기타'}(해당) ${primaryBed.used}/${primaryBed.total} ${available}개</span>
+                                    <span class="bed-text">${bedCategories[patientInfo.type]}(해당) ${primaryBed.used}/${primaryBed.total} ${available}개</span>
                                 </div>
                             </div>
                             
                             <div class="other-beds">
                                 ${Object.entries(hospital.beds)
                                     .filter(([type]) => type !== patientInfo.type)
-                                    .map(([type, bed]) => {
-                                        const typeMap = { adult: '성인', youth: '청소년', alcohol: '알코올', other: '기타' };
-                                        return `<span class="other-bed-item">${typeMap[type]} ${bed.used}/${bed.total}</span>`;
-                                    }).join('')}
+                                    .map(([type, bed]) => `<span class="other-bed-item">${bedCategories[type]} ${bed.used}/${bed.total}</span>`)
+                                    .join('')}
                             </div>
                         </div>
                     </div>
@@ -954,4 +931,3 @@
         updateSelection();
     </script>
 </body>
-</html>
