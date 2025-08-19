@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>병원 관리 - 정신병원입원 의뢰 시스템</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1f2937;
+            line-height: 1.5;
+        }
+
+        /* 헤더 */
+        .header {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 16px 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .system-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1B365D;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .hospital-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .user-info {
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        /* 메인 컨테이너 */
+        .main-container {
+            margin-top: 70px;
+            margin-bottom: 80px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 20px;
+        }
+
+        /* 섹션 공통 스타일 */
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        /* 병원 기본정보 */
+        .hospital-info {
+            display: grid;
+            gap: 16px;
+        }
+
+        .info-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .info-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #6B7280;
+        }
+
+        .info-value {
+            font-size: 16px;
+            color: #1f2937;
+            font-weight: 500;
+        }
+
+        .phone-link {
+            color: #0EA5E9;
+            text-decoration: none;
+        }
+
+        .phone-link:hover {
+            text-decoration: underline;
+        }
+
+        .night-status {
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .night-status.available {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .night-status.unavailable {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* 병상현황 그리드 */
+        .bed-status-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .bed-status-item {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px 16px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .bed-type {
+            font-size: 14px;
+            color: #6B7280;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .bed-count {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .bed-available {
+            font-size: 12px;
+            color: #6B7280;
+        }
+
+        /* 수정 버튼 */
+        .edit-button {
+            background: #0EA5E9;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 16px;
+        }
+
+        .edit-button:hover {
+            background: #0284c7;
+        }
+
+        /* 하단 탭바 */
+        .bottom-tabs {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            z-index: 100;
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            background: none;
+            color: #6B7280;
+        }
+
+        .tab-item.active {
+            color: #0EA5E9;
+        }
+
+        .tab-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .tab-label {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 12px;
+            }
+
+            .info-row {
+                grid-template-columns: 1fr;
+            }
+
+            .bed-status-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 12px;
+            }
+
+            .bed-status-item {
+                padding: 16px 12px;
+            }
+
+            .bed-count {
+                font-size: 20px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .hospital-name {
+                font-size: 14px;
+            }
+
+            .user-info {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .bed-status-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .bed-status-item {
+                padding: 12px 8px;
+            }
+
+            .bed-type {
+                font-size: 12px;
+            }
+
+            .bed-count {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <div class="header-content">
+            <h1 class="system-title">정신병원입원 의뢰시스템</h1>
+            <div class="header-right">
+                <div class="hospital-name" id="hospitalName">서울대학교병원</div>
+                <div class="user-info" id="userName">김의사님</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨테이너 -->
+    <main class="main-container">
+        <!-- 병원 기본정보 섹션 -->
+        <section class="section">
+            <h2 class="section-title">병원 기본정보</h2>
+            <div class="hospital-info">
+                <div class="info-item">
+                    <span class="info-label">병원명</span>
+                    <span class="info-value" id="fullHospitalName">서울대학교병원</span>
+                </div>
+                <div class="info-row">
+                    <div class="info-item">
+                        <span class="info-label">주소</span>
+                        <span class="info-value" id="hospitalAddress">서울특별시 종로구 대학로 101</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">대표 연락처</span>
+                        <span class="info-value">
+                            <a href="tel:02-2072-2972" class="phone-link" id="hospitalPhone">02-2072-2972</a>
+                        </span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">야간진료</span>
+                    <span class="night-status available" id="nightStatus">가능</span>
+                </div>
+            </div>
+
+            <!-- 실시간 병상현황 -->
+            <h2 class="section-title" style="margin-top: 40px;">실시간 병상현황</h2>
+            <div class="bed-status-grid" id="bedStatusGrid">
+                <!-- 병상 현황이 여기에 동적으로 생성됩니다 -->
+            </div>
+
+            <!-- 수정 버튼 -->
+            <button class="edit-button" onclick="editHospitalInfo()">
+                ⚙️ 병원정보 수정
+            </button>
+        </section>
+    </main>
+
+    <!-- 하단 탭바 -->
+    <nav class="bottom-tabs">
+        <button class="tab-item active" onclick="switchTab('hospital-info')">
+            <div class="tab-icon">🏥</div>
+            <div class="tab-label">병원 관리</div>
+        </button>
+        <button class="tab-item" onclick="switchTab('referral-history')">
+            <div class="tab-icon">📋</div>
+            <div class="tab-label">의뢰 이력</div>
+        </button>
+        <button class="tab-item" onclick="switchTab('mypage')">
+            <div class="tab-icon">👤</div>
+            <div class="tab-label">마이페이지</div>
+        </button>
+    </nav>
+
+    <script>
+        // 환자 분류 / 병상 분류 정의
+        const bedCategories = {
+            'adult-male': '성인남',
+            'adult-female': '성인여',
+            'youth-male': '청소년남',
+            'youth-female': '청소년여',
+            'other': '기타'
+        };
+
+        // 샘플 병원 데이터
+        const hospitalData = {
+            name: "서울대학교병원",
+            address: "서울특별시 종로구 대학로 101",
+            phone: "02-2072-2972",
+            nightAvailable: true,
+            beds: {
+                'adult-male': { used: 7, total: 10 },
+                'adult-female': { used: 5, total: 10 },
+                'youth-male': { used: 2, total: 5 },
+                'youth-female': { used: 1, total: 5 },
+                'other': { used: 3, total: 5 }
+            }
+        };
+
+        // 사용자 정보
+        const userData = {
+            name: "김의사님"
+        };
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            renderHospitalInfo();
+            renderBedStatus();
+        });
+
+        // 병원 정보 렌더링
+        function renderHospitalInfo() {
+            document.getElementById('hospitalName').textContent = hospitalData.name;
+            document.getElementById('fullHospitalName').textContent = hospitalData.name;
+            document.getElementById('hospitalAddress').textContent = hospitalData.address;
+            document.getElementById('hospitalPhone').textContent = hospitalData.phone;
+            document.getElementById('hospitalPhone').href = `tel:${hospitalData.phone}`;
+            document.getElementById('userName').textContent = userData.name;
+            
+            const nightStatus = document.getElementById('nightStatus');
+            if (hospitalData.nightAvailable) {
+                nightStatus.textContent = '가능';
+                nightStatus.className = 'night-status available';
+            } else {
+                nightStatus.textContent = '불가능';
+                nightStatus.className = 'night-status unavailable';
+            }
+        }
+
+        // 병상 현황 렌더링
+        function renderBedStatus() {
+            const container = document.getElementById('bedStatusGrid');
+            
+            container.innerHTML = Object.entries(bedCategories).map(([key, label]) => {
+                const bed = hospitalData.beds[key];
+                const available = bed.total - bed.used;
+                
+                return `
+                    <div class="bed-status-item">
+                        <div class="bed-type">${label}</div>
+                        <div class="bed-count">${bed.used}/${bed.total}</div>
+                        <div class="bed-available">${available}개 가용</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 병원정보 수정 (기본정보 + 병상현황 통합)
+        function editHospitalInfo() {
+            alert('병원정보 수정 페이지로 이동합니다.\n- 기본정보: 주소, 연락처, 야간진료 여부\n- 병상현황: 총 병상수, 현재 사용중인 병상수');
+            // 실제 구현: location.href = '/hospital/info/edit';
+        }
+
+        // 탭 전환
+        function switchTab(tabName) {
+            // 모든 탭 비활성화
+            document.querySelectorAll('.tab-item').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 클릭된 탭 활성화
+            event.target.closest('.tab-item').classList.add('active');
+            
+            if (tabName === 'referral-history') {
+                alert('의뢰 이력 페이지로 이동합니다.');
+                // 실제 구현: location.href = '/hospital/referral-history';
+            } else if (tabName === 'mypage') {
+                alert('마이페이지로 이동합니다.');
+                // 실제 구현: location.href = '/hospital/mypage';
+            }
+        }
+    </script>
+</body>
+</html>
