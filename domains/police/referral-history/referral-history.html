@@ -131,7 +131,20 @@
             color: #6B7280;
         }
 
-        .filter-select {
+        .date-filter-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .date-range-picker {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .date-input {
             padding: 8px 12px;
             border: 2px solid #e5e7eb;
             border-radius: 6px;
@@ -140,8 +153,36 @@
             cursor: pointer;
         }
 
-        .filter-select:focus {
+        .date-input:focus {
             outline: none;
+            border-color: #2563EB;
+        }
+
+        .period-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .period-btn {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #e5e7eb;
+            background: white;
+            color: #374151;
+        }
+
+        .period-btn:hover {
+            background: #f3f4f6;
+            border-color: #d1d5db;
+        }
+
+        .period-btn.active {
+            background: #2563EB;
+            color: white;
             border-color: #2563EB;
         }
 
@@ -440,6 +481,33 @@
             background: #1d4ed8;
         }
 
+        /* 더보기 버튼 */
+        .load-more-container {
+            text-align: center;
+            margin-top: 24px;
+        }
+
+        .load-more-btn {
+            background: #2563EB;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .load-more-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .load-more-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
         /* 하단 탭바 */
         .bottom-tabs {
             position: fixed;
@@ -553,12 +621,19 @@
             <div class="filter-row">
                 <div class="filter-group">
                     <label class="filter-label">기간</label>
-                    <select class="filter-select" id="periodFilter" onchange="applyFilters()">
-                        <option value="week">최근 1주일</option>
-                        <option value="month">최근 1개월</option>
-                        <option value="quarter">최근 3개월</option>
-                        <option value="all">전체</option>
-                    </select>
+                    <div class="date-filter-container">
+                        <div class="date-range-picker">
+                            <input type="date" class="date-input" id="startDate">
+                            <span>-</span>
+                            <input type="date" class="date-input" id="endDate">
+                        </div>
+                        <div class="period-buttons">
+                            <button class="period-btn" data-period="1m">1개월</button>
+                            <button class="period-btn" data-period="3m">3개월</button>
+                            <button class="period-btn" data-period="6m">6개월</button>
+                            <button class="period-btn" data-period="1y">1년</button>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -596,6 +671,11 @@
         <section class="request-list" id="requestList">
             <!-- 목록이 여기에 동적으로 생성됩니다 -->
         </section>
+
+        <!-- 더보기 버튼 -->
+        <div class="load-more-container" id="loadMoreContainer">
+            <button class="load-more-btn" id="loadMoreBtn">더보기</button>
+        </div>
     </main>
 
     <!-- 하단 탭바 -->
@@ -624,165 +704,234 @@
             'other': '기타'
         };
 
-        // 샘플 데이터 - 5가지 분류 체계 적용
-        const referralData = [
-            {
-                id: 1,
-                patientName: "홍길동",
-                patientType: "adult-male",
-                requestDate: "2024.01.15 14:30",
-                status: "approved", // 의뢰서 상태 (대기/승인됨/종료)
-                hospitalCount: 3,
-                responses: {
-                    approved: 2,
-                    pending: 1,
-                    rejected: 0
-                },
-                hasRevisionRequest: false,
-                urgentHours: null
-            },
-            {
-                id: 2,
-                patientName: "김영희",
-                patientType: "youth-female",
-                requestDate: "2024.01.14 09:15",
-                status: "pending",
-                hospitalCount: 2,
-                responses: {
-                    approved: 0,
-                    pending: 1,
-                    rejected: 1
-                },
-                hasRevisionRequest: true, // 수정요청 있음
-                urgentHours: null
-            },
-            {
-                id: 3,
-                patientName: "박철수",
-                patientType: "other",
-                requestDate: "2024.01.13 16:45",
-                status: "approved",
-                hospitalCount: 4,
-                responses: {
-                    approved: 1,
-                    pending: 2,
-                    rejected: 1
-                },
-                hasRevisionRequest: false,
-                urgentHours: 2
-            },
-            {
-                id: 4,
-                patientName: "이미영",
-                patientType: "adult-female",
-                requestDate: "2024.01.12 11:20",
-                status: "pending",
-                hospitalCount: 2,
-                responses: {
-                    approved: 0,
-                    pending: 0,
-                    rejected: 2
-                },
-                hasRevisionRequest: false,
-                urgentHours: null
-            },
-            {
-                id: 5,
-                patientName: "정민수",
-                patientType: "youth-male",
-                requestDate: "2024.01.11 13:10",
-                status: "closed",
-                hospitalCount: 3,
-                responses: {
-                    approved: 1,
-                    pending: 0,
-                    rejected: 2
-                },
-                hasRevisionRequest: false,
-                urgentHours: null
-            }
-        ];
-
-        let filteredData = [...referralData];
+        const ITEMS_PER_PAGE = 5;
+        let currentPage = 1;
+        let filteredData = [];
         let statusFilters = ['all'];
+
+        function formatDate(date) {
+            const yyyy = date.getFullYear();
+            const mm = String(date.getMonth() + 1).padStart(2, '0');
+            const dd = String(date.getDate()).padStart(2, '0');
+            const hh = String(date.getHours()).padStart(2, '0');
+            const min = String(date.getMinutes()).padStart(2, '0');
+            return `${yyyy}.${mm}.${dd} ${hh}:${min}`;
+        }
+
+        function generateSampleData() {
+            const data = [];
+            const names = ["홍길동", "김영희", "박철수", "이미영", "정민수", "최수진", "이준호", "윤서아", "강지훈", "신유나"];
+            const patientTypes = Object.keys(bedCategories);
+            const statuses = ["pending", "approved", "closed"];
+            const now = new Date();
+            let idCounter = 1;
+
+            const createReferral = (daysAgo) => {
+                const newDate = new Date();
+                newDate.setDate(now.getDate() - daysAgo);
+                newDate.setHours(Math.floor(Math.random() * 24), Math.floor(Math.random() * 60));
+
+                const status = statuses[Math.floor(Math.random() * statuses.length)];
+                const approvedCount = Math.floor(Math.random() * 3);
+                const pendingCount = Math.floor(Math.random() * 2);
+                const rejectedCount = Math.floor(Math.random() * 2);
+
+                return {
+                    id: idCounter++,
+                    patientName: names[Math.floor(Math.random() * names.length)],
+                    patientType: patientTypes[Math.floor(Math.random() * patientTypes.length)],
+                    requestDate: formatDate(newDate),
+                    status: status,
+                    hospitalCount: approvedCount + pendingCount + rejectedCount,
+                    responses: {
+                        approved: approvedCount,
+                        pending: pendingCount,
+                        rejected: rejectedCount,
+                    },
+                    hasRevisionRequest: Math.random() > 0.8,
+                    urgentHours: Math.random() > 0.9 ? Math.floor(Math.random() * 24) + 1 : null,
+                };
+            };
+
+            // 1개월 내 데이터 3개
+            for (let i = 0; i < 3; i++) {
+                data.push(createReferral(Math.floor(Math.random() * 28))); // 0-27 days ago
+            }
+
+            // 1개월 ~ 3개월 사이 데이터 4개
+            for (let i = 0; i < 4; i++) {
+                data.push(createReferral(30 + Math.floor(Math.random() * 60))); // 30-89 days ago
+            }
+
+            // 3개월 ~ 1년 사이 데이터 13개
+            for (let i = 0; i < 13; i++) {
+                data.push(createReferral(90 + Math.floor(Math.random() * 275))); // 90-364 days ago
+            }
+
+            return data.sort((a, b) => new Date(b.requestDate.replace(/\./g, '-').replace(' ', 'T')) - new Date(a.requestDate.replace(/\./g, '-').replace(' ', 'T')));
+        }
+
+        const referralData = generateSampleData();
 
         // 초기화
         document.addEventListener('DOMContentLoaded', function() {
-            renderRequestList();
-            updateResultCount();
+            setupDateFilters();
+            applyFilters();
             setupAutoRefresh();
+            document.getElementById('loadMoreBtn').addEventListener('click', loadMoreItems);
         });
 
-        // 의뢰서 목록 렌더링
-        function renderRequestList() {
-            const container = document.getElementById('requestList');
+        // 날짜 필터 설정
+        function setupDateFilters() {
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+            const periodButtons = document.querySelectorAll('.period-btn');
+
+            const today = new Date();
+            const endDate = today.toISOString().split('T')[0];
             
-            if (filteredData.length === 0) {
+            today.setMonth(today.getMonth() - 1);
+            const startDate = today.toISOString().split('T')[0];
+
+            startDateInput.value = startDate;
+            endDateInput.value = endDate;
+            
+            document.querySelector('.period-btn[data-period="1m"]').classList.add('active');
+
+            periodButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    periodButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    const period = button.dataset.period;
+                    const newStartDate = new Date();
+                    const newEndDate = new Date();
+                    
+                    endDateInput.value = newEndDate.toISOString().split('T')[0];
+
+                    switch (period) {
+                        case '1m':
+                            newStartDate.setMonth(newStartDate.getMonth() - 1);
+                            break;
+                        case '3m':
+                            newStartDate.setMonth(newStartDate.getMonth() - 3);
+                            break;
+                        case '6m':
+                            newStartDate.setMonth(newStartDate.getMonth() - 6);
+                            break;
+                        case '1y':
+                            newStartDate.setFullYear(newStartDate.getFullYear() - 1);
+                            break;
+                    }
+                    startDateInput.value = newStartDate.toISOString().split('T')[0];
+                    applyFilters();
+                });
+            });
+
+            startDateInput.addEventListener('change', applyFilters);
+            endDateInput.addEventListener('change', applyFilters);
+        }
+
+        // 필터 적용
+        function applyFilters() {
+            const startVal = document.getElementById('startDate').value;
+            const endVal = document.getElementById('endDate').value;
+            const startParts = startVal.split('-').map(Number);
+            const endParts = endVal.split('-').map(Number);
+            const startDate = new Date(startParts[0], startParts[1] - 1, startParts[2]);
+            const endDate = new Date(endParts[0], endParts[1] - 1, endParts[2]);
+            endDate.setHours(23, 59, 59, 999);
+
+            filteredData = referralData.filter(referral => {
+                const statusMatch = statusFilters.includes('all') || statusFilters.includes(referral.status);
+                const requestDate = new Date(referral.requestDate.replace(/\./g, '-').replace(' ', 'T'));
+                const dateMatch = requestDate >= startDate && requestDate <= endDate;
+                return statusMatch && dateMatch;
+            });
+            
+            currentPage = 1;
+            renderRequestList(true);
+        }
+
+        // 의뢰서 목록 렌더링
+        function renderRequestList(isNewFilter = false) {
+            const container = document.getElementById('requestList');
+            const loadMoreContainer = document.getElementById('loadMoreContainer');
+
+            if (isNewFilter) {
+                container.innerHTML = '';
+            }
+
+            if (currentPage === 1 && filteredData.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">📋</div>
-                        <div class="empty-state-title">아직 작성한 의뢰서가 없습니다</div>
-                        <div class="empty-state-message">새로운 의뢰서를 작성해보세요</div>
-                        <button class="empty-state-action" onclick="createNewRequest()">새 의뢰서 작성하기</button>
+                        <div class="empty-state-title">해당 조건의 의뢰서가 없습니다</div>
+                        <div class="empty-state-message">검색 기간이나 상태를 변경해보세요</div>
                     </div>
                 `;
+                loadMoreContainer.style.display = 'none';
+                updateResultCount();
                 return;
             }
 
-            container.innerHTML = filteredData.map(referral => {
-                const statusMap = {
-                    pending: '대기',
-                    approved: '승인됨',
-                    closed: '종료'
-                };
+            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+            const endIndex = startIndex + ITEMS_PER_PAGE;
+            const itemsToRender = filteredData.slice(startIndex, endIndex);
 
-                // 처리 현황 텍스트 생성
-                const processStatus = generateProcessStatus(referral.responses);
+            itemsToRender.forEach(referral => {
+                container.appendChild(createReferralCard(referral));
+            });
 
-                // 특별 알림들
-                const specialNotices = [];
-                if (referral.hasRevisionRequest) {
-                    specialNotices.push(`<div class="revision-notice">📝 수정요청 있음</div>`);
-                }
+            if (endIndex >= filteredData.length) {
+                loadMoreContainer.style.display = 'none';
+            } else {
+                loadMoreContainer.style.display = 'block';
+            }
 
-                const noticesHtml = specialNotices.length > 0 ? 
-                    `<div class="special-notices">${specialNotices.join('')}</div>` : '';
+            updateResultCount();
+        }
 
-                const actionButtons = getActionButtons(referral.status, referral.hasRevisionRequest);
+        function createReferralCard(referral) {
+            const card = document.createElement('div');
+            card.className = 'request-card';
 
-                return `
-                    <div class="request-card">
-                        <div class="status-bar ${referral.status}"></div>
-                        <div class="card-content">
-                            <div class="card-header">
-                                <div class="patient-row">
-                                    <div class="patient-left">
-                                        <div class="patient-name">${referral.patientName}</div>
-                                        <span class="patient-type ${referral.patientType}">${bedCategories[referral.patientType]}</span>
-                                    </div>
-                                    <div class="patient-right">
-                                        ${referral.urgentHours ? `<div class="urgent-warning">⚠️ ${referral.urgentHours}시간 남음</div>` : ''}
-                                        <span class="request-date">${referral.requestDate}</span>
-                                    </div>
-                                </div>
-                                <div class="status-row">
-                                    <div class="status-badge ${referral.status}">
-                                        ${statusMap[referral.status]}
-                                    </div>
-                                </div>
+            const statusMap = { pending: '대기', approved: '승인됨', closed: '종료' };
+            const processStatus = generateProcessStatus(referral.responses);
+            const specialNotices = referral.hasRevisionRequest ? `<div class="special-notices"><div class="revision-notice">📝 수정요청 있음</div></div>` : '';
+            const actionButtons = getActionButtons(referral.status, referral.hasRevisionRequest);
+
+            card.innerHTML = `
+                <div class="status-bar ${referral.status}"></div>
+                <div class="card-content">
+                    <div class="card-header">
+                        <div class="patient-row">
+                            <div class="patient-left">
+                                <div class="patient-name">${referral.patientName}</div>
+                                <span class="patient-type ${referral.patientType}">${bedCategories[referral.patientType]}</span>
                             </div>
-                            
-                            <div class="request-details">
-                                <span class="hospital-count">${referral.hospitalCount}개 병원 전송</span> → ${processStatus}
+                            <div class="patient-right">
+                                ${referral.urgentHours ? `<div class="urgent-warning">⚠️ ${referral.urgentHours}시간 남음</div>` : ''}
+                                <span class="request-date">${referral.requestDate}</span>
                             </div>
-                            
-                            ${noticesHtml}
-                            
-                            ${actionButtons ? `<div class="card-actions">${actionButtons}</div>` : ''}
+                        </div>
+                        <div class="status-row">
+                            <div class="status-badge ${referral.status}">${statusMap[referral.status]}</div>
                         </div>
                     </div>
-                `;
-            }).join('');
+                    <div class="request-details">
+                        <span class="hospital-count">${referral.hospitalCount}개 병원 전송</span> → ${processStatus}
+                    </div>
+                    ${specialNotices}
+                    ${actionButtons ? `<div class="card-actions">${actionButtons}</div>` : ''}
+                </div>
+            `;
+            return card;
+        }
+
+        function loadMoreItems() {
+            currentPage++;
+            renderRequestList();
         }
 
         // 처리 현황 텍스트 생성
@@ -797,68 +946,50 @@
         // 상태별 액션 버튼 생성
         function getActionButtons(status, hasRevisionRequest) {
             let buttons = '';
-            
             if (hasRevisionRequest) {
                 buttons += `<button class="action-button btn-edit" onclick="editRequest()">수정</button>`;
             }
-            
             return buttons;
         }
 
         // 상태 필터 토글
         function toggleStatusFilter(status) {
+            const allCheckbox = document.getElementById('all');
+            const otherCheckboxes = document.querySelectorAll('.status-filter input:not(#all)');
+
             if (status === 'all') {
                 statusFilters = ['all'];
-                // 모든 체크박스 해제하고 전체만 체크
-                document.querySelectorAll('.status-filter input').forEach(input => {
-                    input.checked = input.id === 'all';
-                });
+                otherCheckboxes.forEach(input => input.checked = false);
+                allCheckbox.checked = true;
             } else {
-                // 전체 해제
-                document.getElementById('all').checked = false;
-                
-                if (statusFilters.includes('all')) {
-                    statusFilters = [];
-                }
-                
-                if (statusFilters.includes(status)) {
-                    statusFilters = statusFilters.filter(s => s !== status);
-                } else {
+                allCheckbox.checked = false;
+                statusFilters = statusFilters.filter(s => s !== 'all');
+                const checkbox = document.getElementById(status);
+                if (checkbox.checked) {
                     statusFilters.push(status);
+                } else {
+                    statusFilters = statusFilters.filter(s => s !== status);
                 }
                 
-                // 아무것도 선택되지 않았으면 전체 선택
                 if (statusFilters.length === 0) {
                     statusFilters = ['all'];
-                    document.getElementById('all').checked = true;
+                    allCheckbox.checked = true;
                 }
             }
             
             applyFilters();
         }
 
-        // 필터 적용
-        function applyFilters() {
-            filteredData = referralData.filter(referral => {
-                if (statusFilters.includes('all')) {
-                    return true;
-                }
-                return statusFilters.includes(referral.status);
-            });
-            
-            renderRequestList();
-            updateResultCount();
-        }
-
         // 결과 수 업데이트
         function updateResultCount() {
-            document.getElementById('resultCount').textContent = `총 ${filteredData.length}건`;
+            const list = document.getElementById('requestList');
+            const shownCount = list.getElementsByClassName('request-card').length;
+            document.getElementById('resultCount').textContent = `총 ${filteredData.length}건 중 ${shownCount}건`;
         }
 
         // 자동 새로고침 (30초마다)
         function setupAutoRefresh() {
             setInterval(() => {
-                // 실제로는 서버에서 최신 데이터 조회
                 console.log('자동 새로고침 중...');
             }, 30000);
         }
@@ -866,19 +997,13 @@
         // 액션 함수들
         function refreshData() {
             alert('데이터를 새로고침합니다.');
-            // 실제로는 서버에서 최신 데이터 조회
         }
 
         function openSearch() {
             const keyword = prompt('환자명 또는 병원명을 입력하세요:');
             if (keyword) {
                 alert(`"${keyword}" 검색 결과`);
-                // 실제로는 검색 기능 구현
             }
-        }
-
-        function viewDetail() {
-            alert('의뢰서 상세 페이지로 이동합니다.');
         }
 
         function editRequest() {
