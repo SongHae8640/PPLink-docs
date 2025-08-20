@@ -360,6 +360,26 @@
             opacity: 0.5;
         }
 
+        /* 정보 섹션 */
+        .info-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .info-section h2 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #1f2937;
+        }
+        .info-section p {
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.6;
+        }
+
         /* 반응형 */
         @media (max-width: 768px) {
             .main-container {
@@ -442,6 +462,13 @@
                 </div>
                 <label class="filter-label">야간병원만 표시 (18시~09시)</label>
             </div>
+        </section>
+
+        <!-- 응급개입팀 연락처 -->
+        <section class="info-section">
+            <h2>응급개입팀 연락처</h2>
+            <p><strong>평택경찰서 응급개입팀:</strong> 010-7777-7777 (09:00~18:00)</p>
+            <p><strong>경기남부청 응급개입팀:</strong> 010-8888-8888 (19:00 ~ 08:00)</p>
         </section>
 
         <!-- 병원 목록 -->
