@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마이페이지 - 정신병원입원 의뢰 시스템</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1f2937;
+            line-height: 1.5;
+        }
+
+        /* 헤더 */
+        .header {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 16px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .system-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1B365D;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .hospital-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        .user-info {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .logout-btn {
+            background: none;
+            border: 1px solid #e5e7eb;
+            color: #374151;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+
+        /* 메인 컨테이너 */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            margin-bottom: 80px;
+        }
+
+        /* 탭 네비게이션 */
+        .tab-navigation {
+            display: flex;
+            background: white;
+            border-radius: 12px;
+            padding: 6px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            background: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #6B7280;
+        }
+
+        .tab-button.active {
+            background: #2563EB;
+            color: white;
+        }
+
+        /* 섹션 공통 스타일 */
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        /* 정보 그리드 */
+        .info-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #6B7280;
+            flex-shrink: 0;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: #1f2937;
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .edit-mode .info-item .form-input {
+            max-width: 200px;
+        }
+
+
+        /* 편집 모드 */
+        .edit-mode {
+            display: none;
+        }
+
+        .edit-mode.active {
+            display: block;
+        }
+
+        .view-mode.editing {
+            display: none;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #2563EB;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* 버튼 스타일 */
+        .btn-primary {
+            background: #2563EB;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #374151;
+            border: 2px solid #e5e7eb;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .logout-button {
+            background: #DC2626;
+            color: white;
+            border: none;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            width: 100%;
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        .logout-button:hover {
+            background: #B91C1C;
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 16px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <div class="header-content">
+            <h1 class="system-title">정신병원입원 의뢰 시스템</h1>
+            <div class="header-right">
+                <span class="hospital-name">서울대학교병원</span>
+                <span class="user-info">김의사님</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨테이너 -->
+    <div class="main-container">
+        <!-- 탭 네비게이션 -->
+        <div class="tab-navigation">
+            <button class="tab-button">병원 관리</button>
+            <button class="tab-button">의뢰 이력</button>
+            <button class="tab-button active">마이페이지</button>
+        </div>
+
+        <!-- 계정 정보 섹션 -->
+        <section class="section">
+            <h2 class="section-title">계정 정보</h2>
+            
+            <!-- 조회 모드 -->
+            <div class="view-mode" id="viewMode">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">이름</span>
+                        <span class="info-value" id="userName">김민수</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">소속 병원</span>
+                        <span class="info-value" id="hospitalName">서울대학교병원</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">휴대폰 번호</span>
+                        <span class="info-value" id="phoneDisplay">010-1234-5678</span>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-primary" onclick="enterEditMode()">휴대폰 번호 수정</button>
+                </div>
+            </div>
+
+            <!-- 편집 모드 -->
+            <div class="edit-mode" id="editMode">
+                <form id="editForm">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">이름</span>
+                            <span class="info-value">김민수</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">소속 병원</span>
+                            <span class="info-value">서울대학교병원</span>
+                        </div>
+                        <div class="info-item">
+                            <label class="info-label" for="phoneInput">휴대폰 번호</label>
+                            <input type="tel" class="form-input" id="phoneInput" name="phone" value="010-1234-5678" placeholder="010-0000-0000">
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn-secondary" onclick="cancelEdit()">취소</button>
+                        <button type="submit" class="btn-primary">저장</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- 로그아웃 버튼 -->
+        <button class="logout-button" onclick="logout()">로그아웃</button>
+    </div>
+
+
+    <script>
+        // 편집 모드 진입
+        function enterEditMode() {
+            document.getElementById('viewMode').classList.add('editing');
+            document.getElementById('editMode').classList.add('active');
+            // 편집 모드 진입 시, 현재 표시된 휴대폰 번호를 입력 필드에 설정
+            document.getElementById('phoneInput').value = document.getElementById('phoneDisplay').textContent;
+        }
+
+        // 편집 취소
+        function cancelEdit() {
+            document.getElementById('viewMode').classList.remove('editing');
+            document.getElementById('editMode').classList.remove('active');
+        }
+
+        // 폼 제출 처리
+        document.getElementById('editForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            // 전화번호 형식 검증
+            const phone = formData.get('phone');
+            const phoneRegex = /^010-\d{4}-\d{4}$/;
+            if (!phoneRegex.test(phone)) {
+                alert('올바른 전화번호 형식을 입력하세요. (010-0000-0000)');
+                return;
+            }
+            
+            if (confirm('휴대폰 번호를 수정하시겠습니까?')) {
+                // 실제로는 서버에 업데이트 요청
+                updateDisplayValues(formData);
+                
+                document.getElementById('viewMode').classList.remove('editing');
+                document.getElementById('editMode').classList.remove('active');
+                
+                alert('휴대폰 번호가 수정되었습니다.');
+            }
+        });
+
+        // 화면 표시값 업데이트
+        function updateDisplayValues(formData) {
+            document.getElementById('phoneDisplay').textContent = formData.get('phone');
+        }
+
+        // 전화번호 자동 하이픈 추가
+        document.getElementById('phoneInput').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^\d]/g, '');
+            let formattedValue = '';
+            
+            if (value.length > 3 && value.length <= 7) {
+                formattedValue = value.slice(0, 3) + '-' + value.slice(3);
+            } else if (value.length > 7) {
+                formattedValue = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7, 11);
+            } else {
+                formattedValue = value;
+            }
+            
+            e.target.value = formattedValue;
+        });
+
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                alert('로그아웃되었습니다.');
+                // 실제로는 서버에 로그아웃 요청 후 로그인 페이지로 이동
+                // location.href = '/login';
+            }
+        }
+
+        // 초기 설정
+        document.addEventListener('DOMContentLoaded', function() {
+            // 페이지 로드 시 초기 설정
+            console.log('마이페이지 로드 완료');
+        });
+    </script>
+</body>
+</html>

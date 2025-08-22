@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>의뢰서 상세 - 정신병원입원 의뢰 시스템</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1f2937;
+            line-height: 1.5;
+        }
+
+        /* 헤더 */
+        .header {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 16px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .back-btn {
+            background: none;
+            border: 1px solid #e5e7eb;
+            color: #374151;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+
+        .page-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .referral-number {
+            font-size: 14px;
+            color: #6b7280;
+            background: #f3f4f6;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .header-btn {
+            background: none;
+            border: 1px solid #e5e7eb;
+            color: #374151;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .header-btn:hover {
+            background: #f9fafb;
+        }
+
+        /* 메인 컨테이너 */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            margin-bottom: 120px;
+        }
+
+        /* 상태 카드 */
+        .status-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .received-time {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .status-badge {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .status-approved {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .status-rejected {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .status-revision {
+            background: #fed7aa;
+            color: #ea580c;
+        }
+
+        .status-info {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .status-label {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .status-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .urgent-tag {
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 12px;
+        }
+
+        /* 정보 섹션 */
+        .info-section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f3f4f6;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .info-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .info-group-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+        }
+
+        .info-label {
+            font-size: 13px;
+            color: #6b7280;
+            min-width: 80px;
+        }
+
+        .info-value {
+            font-size: 13px;
+            color: #1f2937;
+            font-weight: 500;
+            text-align: right;
+            flex: 1;
+        }
+
+        .phone-link {
+            color: #2563EB;
+            text-decoration: none;
+        }
+
+        .phone-link:hover {
+            text-decoration: underline;
+        }
+
+        /* 첨부 사진 */
+        .photos-section {
+            margin-top: 20px;
+        }
+
+        .photos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .photo-item {
+            aspect-ratio: 1;
+            background: #f3f4f6;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .photo-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #9ca3af;
+            font-size: 24px;
+        }
+
+        /* 병상 현황 */
+        .bed-status {
+            background: #f8fafc;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .bed-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bed-details {
+            display: flex;
+            gap: 24px;
+        }
+
+        .bed-item {
+            text-align: center;
+        }
+
+        .bed-number {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .bed-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .availability {
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+
+        .available {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .unavailable {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        /* 처리 버튼 영역 */
+        .action-section {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 50;
+        }
+
+        .action-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .approve-btn {
+            background: #10b981;
+            color: white;
+        }
+
+        .approve-btn:hover {
+            background: #059669;
+        }
+
+        .reject-btn {
+            background: #ef4444;
+            color: white;
+        }
+
+        .reject-btn:hover {
+            background: #dc2626;
+        }
+
+        .revision-btn {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .revision-btn:hover {
+            background: #d97706;
+        }
+
+        /* 모달 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1f2937;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .form-radio-group {
+            display: flex;
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .form-radio {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-primary {
+            background: #2563EB;
+            color: white;
+        }
+
+        .modal-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .modal-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .modal-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 16px;
+                margin-bottom: 100px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .status-info {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .bed-details {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+
+            .action-container {
+                flex-direction: column;
+            }
+
+            .photos-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <button class="back-btn">← 뒤로가기</button>
+                <h1 class="page-title">의뢰서 상세</h1>
+                <span class="referral-number">REF-2024-0156</span>
+            </div>
+            <div class="header-actions">
+                <button class="header-btn">PDF 다운로드</button>
+                <button class="header-btn">인쇄</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨테이너 -->
+    <div class="main-container">
+        <!-- 상태 카드 -->
+        <div class="status-card">
+            <div class="status-header">
+                <span class="received-time">2024.01.25 14:30 접수</span>
+                <div>
+                    <span class="status-badge status-pending">대기중</span>
+                    <span class="urgent-tag">응급</span>
+                </div>
+            </div>
+            <div class="status-info">
+                <div class="status-item">
+                    <span class="status-label">경과 시간</span>
+                    <span class="status-value">2시간 30분</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">처리 상태</span>
+                    <span class="status-value">검토 대기 중</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">우선순위</span>
+                    <span class="status-value">응급 처리 필요</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 환자 정보 -->
+        <div class="info-section">
+            <h2 class="section-title">환자 정보</h2>
+            <div class="info-grid">
+                <div class="info-group">
+                    <h3 class="info-group-title">기본 정보</h3>
+                    <div class="info-row">
+                        <span class="info-label">환자명</span>
+                        <span class="info-value">김민수</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">성별</span>
+                        <span class="info-value">남성</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">나이</span>
+                        <span class="info-value">32세</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">환자분류</span>
+                        <span class="info-value">성인 남성</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">신장</span>
+                        <span class="info-value">175cm</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">체중</span>
+                        <span class="info-value">70kg</span>
+                    </div>
+                </div>
+
+                <div class="info-group">
+                    <h3 class="info-group-title">보호자 정보</h3>
+                    <div class="info-row">
+                        <span class="info-label">보호자명</span>
+                        <span class="info-value">김영희</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">관계</span>
+                        <span class="info-value">배우자</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">연락처</span>
+                        <a href="tel:010-1234-5678" class="info-value phone-link">010-1234-5678</a>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">주소</span>
+                        <span class="info-value">경기도 평택시 안중읍</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-row" style="margin-top: 20px;">
+                <span class="info-label">특이사항</span>
+                <span class="info-value">환자가 극도로 흥분 상태이며, 자해 위험이 있음. 지속적인 감시가 필요한 상황입니다.</span>
+            </div>
+
+            <!-- 첨부 사진 -->
+            <div class="photos-section">
+                <h3 class="info-group-title">첨부 사진 (3장)</h3>
+                <div class="photos-grid">
+                    <div class="photo-item">
+                        <div class="photo-placeholder">📷</div>
+                    </div>
+                    <div class="photo-item">
+                        <div class="photo-placeholder">📷</div>
+                    </div>
+                    <div class="photo-item">
+                        <div class="photo-placeholder">📷</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 의뢰 경찰관 정보 -->
+        <div class="info-section">
+            <h2 class="section-title">의뢰 경찰관 정보</h2>
+            <div class="info-grid">
+                <div class="info-group">
+                    <h3 class="info-group-title">소속 정보</h3>
+                    <div class="info-row">
+                        <span class="info-label">지역</span>
+                        <span class="info-value">경기도</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">경찰서</span>
+                        <span class="info-value">평택경찰서</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">파출소</span>
+                        <span class="info-value">안중파출소</span>
+                    </div>
+                </div>
+
+                <div class="info-group">
+                    <h3 class="info-group-title">경찰관 정보</h3>
+                    <div class="info-row">
+                        <span class="info-label">계급</span>
+                        <span class="info-value">경위</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">성명</span>
+                        <span class="info-value">박민호</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">연락처</span>
+                        <a href="tel:010-9876-5432" class="info-value phone-link">010-9876-5432</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 병원 병상 현황 -->
+        <div class="info-section">
+            <h2 class="section-title">병상 현황 (성인 남성)</h2>
+            <div class="bed-status">
+                <div class="bed-info">
+                    <div class="bed-details">
+                        <div class="bed-item">
+                            <div class="bed-number">10</div>
+                            <div class="bed-label">총 병상</div>
+                        </div>
+                        <div class="bed-item">
+                            <div class="bed-number">7</div>
+                            <div class="bed-label">사용중</div>
+                        </div>
+                        <div class="bed-item">
+                            <div class="bed-number">3</div>
+                            <div class="bed-label">가용 병상</div>
+                        </div>
+                    </div>
+                    <div class="availability available">입원 가능</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 처리 버튼 영역 -->
+    <div class="action-section">
+        <div class="action-container">
+            <button class="action-btn approve-btn" onclick="openApproveModal()">입원 승인</button>
+            <button class="action-btn reject-btn" onclick="openRejectModal()">입원 거부</button>
+            <button class="action-btn revision-btn" onclick="openRevisionModal()">수정 요청</button>
+        </div>
+    </div>
+
+    <!-- 승인 모달 -->
+    <div id="approveModal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title">입원 승인</h3>
+            <div class="form-group">
+                <label class="form-label">입원 예정 시간</label>
+                <input type="datetime-local" class="form-input" value="2024-01-25T17:00">
+            </div>
+            <div class="form-group">
+                <label class="form-label">담당 의료진 (선택사항)</label>
+                <input type="text" class="form-input" placeholder="담당 의료진 이름">
+            </div>
+            <div class="form-group">
+                <label class="form-label">승인 메모 (선택사항)</label>
+                <textarea class="form-textarea" placeholder="추가 안내사항이나 메모를 입력하세요"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-secondary" onclick="closeModal('approveModal')">취소</button>
+                <button class="modal-btn modal-primary">승인 완료</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 거부 모달 -->
+    <div id="rejectModal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title">입원 거부</h3>
+            <div class="form-group">
+                <label class="form-label">거부 사유 (필수)</label>
+                <div class="form-radio-group">
+                    <label class="form-radio">
+                        <input type="radio" name="rejectReason" value="bed">
+                        <span>병상 부족</span>
+                    </label>
+                    <label class="form-radio">
+                        <input type="radio" name="rejectReason" value="condition">
+                        <span>환자 상태 부적합</span>
+                    </label>
+                </div>
+                <div class="form-radio-group">
+                    <label class="form-radio">
+                        <input type="radio" name="rejectReason" value="treatment">
+                        <span>전문 치료 불가</span>
+                    </label>
+                    <label class="form-radio">
+                        <input type="radio" name="rejectReason" value="other">
+                        <span>기타</span>
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">상세 사유</label>
+                <textarea class="form-textarea" placeholder="거부 사유를 상세히 입력해주세요" required></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">대안 병원 추천 (선택사항)</label>
+                <textarea class="form-textarea" placeholder="추천할 다른 병원이 있다면 입력해주세요"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-secondary" onclick="closeModal('rejectModal')">취소</button>
+                <button class="modal-btn modal-primary" style="background: #ef4444;">거부 완료</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 수정요청 모달 -->
+    <div id="revisionModal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title">추가 정보 요청</h3>
+            <div class="form-group">
+                <label class="form-label">요청 항목</label>
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+                    <label class="form-radio">
+                        <input type="checkbox" name="revisionItems">
+                        <span>환자 추가 사진</span>
+                    </label>
+                    <label class="form-radio">
+                        <input type="checkbox" name="revisionItems">
+                        <span>보호자 추가 정보</span>
+                    </label>
+                    <label class="form-radio">
+                        <input type="checkbox" name="revisionItems">
+                        <span>의료 기록 첨부</span>
+                    </label>
+                    <label class="form-radio">
+                        <input type="checkbox" name="revisionItems">
+                        <span>기타 정보</span>
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">요청 내용 상세</label>
+                <textarea class="form-textarea" placeholder="필요한 추가 정보나 수정사항을 상세히 입력해주세요" required></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">긴급도</label>
+                <div class="form-radio-group">
+                    <label class="form-radio">
+                        <input type="radio" name="urgency" value="normal" checked>
+                        <span>일반</span>
+                    </label>
+                    <label class="form-radio">
+                        <input type="radio" name="urgency" value="urgent">
+                        <span>긴급</span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-secondary" onclick="closeModal('revisionModal')">취소</button>
+                <button class="modal-btn modal-primary" style="background: #f59e0b;">요청 전송</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 모달 열기/닫기 함수
+        function openApproveModal() {
+            document.getElementById('approveModal').classList.add('show');
+        }
+
+        function openRejectModal() {
+            document.getElementById('rejectModal').classList.add('show');
+        }
+
+        function openRevisionModal() {
+            document.getElementById('revisionModal').classList.add('show');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // 모달 외부 클릭 시 닫기
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('show');
+                }
+            });
+        });
+
+        // 뒤로가기 버튼
+        document.querySelector('.back-btn').addEventListener('click', function() {
+            history.back();
+        });
+
+        // 사진 클릭 시 확대 보기 (실제 구현 시 이미지 뷰어 연동)
+        document.querySelectorAll('.photo-item').forEach(item => {
+            item.addEventListener('click', function() {
+                console.log('사진 확대 보기');
+                // 실제로는 이미지 뷰어 모달 또는 페이지로 이동
+            });
+        });
+
+        // 전화 연결 시 확인 다이얼로그
+        document.querySelectorAll('.phone-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                const phoneNumber = this.textContent;
+                if (!confirm(`${phoneNumber}로 전화를 걸까요?`)) {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        // 실시간 경과 시간 업데이트
+        function updateElapsedTime() {
+            // 실제로는 서버 시간과 접수 시간을 계산
+            console.log('경과 시간 업데이트');
+        }
+
+        // 1분마다 경과 시간 업데이트
+        setInterval(updateElapsedTime, 60000);
+    </script>
+</body>
+</html>
