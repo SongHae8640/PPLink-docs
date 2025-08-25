@@ -601,7 +601,6 @@
         <div class="header-content">
             <h1 class="system-title">의뢰 이력</h1>
             <div class="header-actions">
-                <button class="header-button" onclick="refreshData()">🔄 새로고침</button>
                 <button class="header-button" onclick="openSearch()">🔍 검색</button>
             </div>
         </div>
@@ -777,7 +776,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             setupDateFilters();
             applyFilters();
-            setupAutoRefresh();
             document.getElementById('loadMoreBtn').addEventListener('click', loadMoreItems);
         });
 
@@ -987,17 +985,8 @@
             document.getElementById('resultCount').textContent = `총 ${filteredData.length}건 중 ${shownCount}건`;
         }
 
-        // 자동 새로고침 (30초마다)
-        function setupAutoRefresh() {
-            setInterval(() => {
-                console.log('자동 새로고침 중...');
-            }, 30000);
-        }
 
         // 액션 함수들
-        function refreshData() {
-            alert('데이터를 새로고침합니다.');
-        }
 
         function openSearch() {
             const keyword = prompt('환자명 또는 병원명을 입력하세요:');

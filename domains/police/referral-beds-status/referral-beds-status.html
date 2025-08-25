@@ -479,9 +479,6 @@
 
     <!-- 플로팅 액션 버튼들 -->
     <div class="floating-actions">
-        <button class="fab fab-secondary" id="refreshButton" onclick="refreshData()" title="새로고침">
-            🔄
-        </button>
         <button class="fab fab-primary" onclick="createNewRequest()" title="새 의뢰서 작성">
             ✏️
         </button>
@@ -581,7 +578,6 @@
             checkNightTime();
             renderHospitalList();
             setupToggle();
-            setupAutoRefresh();
         });
 
         // 야간시간 체크 (18시-09시)
@@ -673,37 +669,7 @@
             `).join('');
         }
 
-        // 데이터 새로고침
-        async function refreshData() {
-            const refreshButton = document.getElementById('refreshButton');
-            refreshButton.classList.add('loading');
-            
-            try {
-                // 실제 구현에서는 API 호출
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                
-                // 샘플: 일부 데이터 랜덤 업데이트
-                hospitalData.forEach(hospital => {
-                    Object.keys(hospital.beds).forEach(bedType => {
-                        const bed = hospital.beds[bedType];
-                        bed.used = Math.max(0, Math.min(bed.total, 
-                            bed.used + Math.floor(Math.random() * 3) - 1));
-                    });
-                });
-                
-                renderHospitalList();
-                
-            } catch (error) {
-                alert('데이터 새로고침 중 오류가 발생했습니다.');
-            } finally {
-                refreshButton.classList.remove('loading');
-            }
-        }
 
-        // 자동 새로고침 설정 (30초마다)
-        function setupAutoRefresh() {
-            setInterval(refreshData, 30000);
-        }
 
         // 병원 상세 정보 표시
         function showHospitalDetail(hospitalId) {
