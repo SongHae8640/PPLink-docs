@@ -746,20 +746,10 @@
 
         // 탭 전환
         function switchTab(tabName) {
-            // 모든 탭 비활성화
-            document.querySelectorAll('.tab-item').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // 클릭된 탭 활성화
-            event.target.closest('.tab-item').classList.add('active');
-            
             if (tabName === 'referral-history') {
-                alert('의뢰 이력 페이지로 이동합니다.');
-                // 실제 구현: location.href = '/hospital/referral-history';
+                window.location.href = '../referral-history/referral-history.html';
             } else if (tabName === 'mypage') {
-                alert('마이페이지로 이동합니다.');
-                // 실제 구현: location.href = '/hospital/mypage';
+                window.location.href = '../mypage/mypage.html';
             }
         }
     </script>

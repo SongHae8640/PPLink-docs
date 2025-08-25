@@ -495,7 +495,7 @@
         </button>
         <button class="tab-item" onclick="switchTab('history')">
             <div class="tab-icon">📋</div>
-            <div class="tab-label">신청이력</div>
+            <div class="tab-label">의뢰이력</div>
         </button>
         <button class="tab-item" onclick="switchTab('mypage')">
             <div class="tab-icon">👤</div>
@@ -719,40 +719,27 @@
         // 특정 병원으로 의뢰서 작성
         function createRequestToHospital(hospitalId) {
             const hospital = hospitalData.find(h => h.id === hospitalId);
-            alert(`${hospital.name}로 의뢰서 작성 페이지로 이동합니다.`);
-            // 실제 구현: location.href = `/request/create?hospitalId=${hospitalId}`;
+            window.location.href = '../referral-create-patient/referral-create-patient.html?hospitalId=' + hospitalId;
         }
 
         // 새 의뢰서 작성
         function createNewRequest() {
-            alert('새 의뢰서 작성 페이지로 이동합니다.');
-            // 실제 구현: location.href = '/request/create';
+            window.location.href = '../referral-create-patient/referral-create-patient.html';
         }
 
         // 탭 전환
         function switchTab(tabName) {
-            // 모든 탭 비활성화
-            document.querySelectorAll('.tab-item').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // 클릭된 탭 활성화
-            event.target.closest('.tab-item').classList.add('active');
-            
             if (tabName === 'history') {
-                alert('신청이력 페이지로 이동합니다.');
-                // 실제 구현: location.href = '/history';
+                window.location.href = '../referral-history/referral-history.html';
             } else if (tabName === 'mypage') {
-                alert('마이페이지로 이동합니다.');
-                // 실제 구현: location.href = '/mypage';
+                window.location.href = '../mypage/mypage.html';
             }
         }
 
         // 로그아웃
         function logout() {
             if (confirm('로그아웃 하시겠습니까?')) {
-                alert('로그아웃되었습니다.');
-                // 실제 구현: location.href = '/login';
+                window.location.href = '../auth-login/auth-login.html';
             }
         }
     </script>

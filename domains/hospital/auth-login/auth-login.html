@@ -360,9 +360,8 @@
                 await new Promise(resolve => setTimeout(resolve, 1500)); // 시뮬레이션
                 
                 // 로그인 성공 시뮬레이션 (실제로는 서버 응답에 따라 처리)
-                if (username === 'hospital001' && password === 'demo') {
-                    alert('로그인 성공! 병원 정보로 이동합니다.');
-                    // 실제로는 location.href = '/hospital/hospital-info' 등으로 리다이렉트
+                if (username === 'demo' && password === 'demo') {
+                    window.location.href = '../hospital-info/hospital-info.html';
                 } else {
                     // 로그인 실패
                     errorMessage.classList.add('show');

@@ -83,6 +83,45 @@
             margin-bottom: 80px;
         }
 
+        /* 하단 탭바 */
+        .bottom-tabs {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            z-index: 100;
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            background: none;
+            color: #6B7280;
+        }
+
+        .tab-item.active {
+            color: #2563EB;
+        }
+
+        .tab-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .tab-label {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
         /* 탭 네비게이션 */
         .tab-navigation {
             display: flex;
@@ -284,12 +323,6 @@
 
     <!-- 메인 컨테이너 -->
     <div class="main-container">
-        <!-- 탭 네비게이션 -->
-        <div class="tab-navigation">
-            <button class="tab-button">병원 관리</button>
-            <button class="tab-button">의뢰 이력</button>
-            <button class="tab-button active">마이페이지</button>
-        </div>
 
         <!-- 계정 정보 섹션 -->
         <section class="section">
@@ -347,6 +380,21 @@
         <button class="logout-button" onclick="logout()">로그아웃</button>
     </div>
 
+    <!-- 하단 탭바 -->
+    <nav class="bottom-tabs">
+        <button class="tab-item" onclick="switchTab('hospital-info')">
+            <div class="tab-icon">🏥</div>
+            <div class="tab-label">병원 관리</div>
+        </button>
+        <button class="tab-item" onclick="switchTab('referral-history')">
+            <div class="tab-icon">📋</div>
+            <div class="tab-label">의뢰 이력</div>
+        </button>
+        <button class="tab-item active" onclick="switchTab('mypage')">
+            <div class="tab-icon">👤</div>
+            <div class="tab-label">마이페이지</div>
+        </button>
+    </nav>
 
     <script>
         // 편집 모드 진입
@@ -412,9 +460,16 @@
         // 로그아웃
         function logout() {
             if (confirm('로그아웃 하시겠습니까?')) {
-                alert('로그아웃되었습니다.');
-                // 실제로는 서버에 로그아웃 요청 후 로그인 페이지로 이동
-                // location.href = '/login';
+                window.location.href = '../auth-login/auth-login.html';
+            }
+        }
+
+        // 탭 전환 기능
+        function switchTab(tabName) {
+            if (tabName === 'hospital-info') {
+                window.location.href = '../hospital-info/hospital-info.html';
+            } else if (tabName === 'referral-history') {
+                window.location.href = '../referral-history/referral-history.html';
             }
         }
 

@@ -351,8 +351,7 @@
                 
                 // 로그인 성공 시뮬레이션 (실제로는 서버 응답에 따라 처리)
                 if (username === 'demo' && password === 'demo') {
-                    alert('로그인 성공! 병상현황로 이동합니다.');
-                    // 실제로는 location.href = '/police/referral-beds-status' 등으로 리다이렉트
+                    window.location.href = '../referral-beds-status/referral-beds-status.html';
                 } else {
                     // 로그인 실패
                     errorMessage.classList.add('show');

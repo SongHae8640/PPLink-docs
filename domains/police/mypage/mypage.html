@@ -420,28 +420,16 @@
         // 로그아웃
         function logout() {
             if (confirm('로그아웃 하시겠습니까?')) {
-                alert('로그아웃되었습니다.');
-                // 실제로는 서버에 로그아웃 요청 후 로그인 페이지로 이동
-                // location.href = '/login';
+                window.location.href = '../auth-login/auth-login.html';
             }
         }
 
         // 탭 전환
         function switchTab(tabName) {
-            // 모든 탭 비활성화
-            document.querySelectorAll('.tab-item').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
             if (tabName === 'bed-status') {
-                alert('병상현황 페이지로 이동합니다.');
-                // 실제로는 location.href = '/beds-status';
+                window.location.href = '../referral-beds-status/referral-beds-status.html';
             } else if (tabName === 'history') {
-                alert('신청이력 페이지로 이동합니다.');
-                // 실제로는 location.href = '/history';
-            } else if (tabName === 'mypage') {
-                // 현재 페이지이므로 활성화만
-                event.target.closest('.tab-item').classList.add('active');
+                window.location.href = '../referral-history/referral-history.html';
             }
         }
     </script>

@@ -83,6 +83,45 @@
             margin-bottom: 80px;
         }
 
+        /* 하단 탭바 */
+        .bottom-tabs {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            z-index: 100;
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            background: none;
+            color: #6B7280;
+        }
+
+        .tab-item.active {
+            color: #2563EB;
+        }
+
+        .tab-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .tab-label {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
         /* 탭 네비게이션 */
         .tab-navigation {
             display: flex;
@@ -491,12 +530,6 @@
 
     <!-- 메인 컨테이너 -->
     <div class="main-container">
-        <!-- 탭 네비게이션 -->
-        <div class="tab-navigation">
-            <button class="tab-button">병원 관리</button>
-            <button class="tab-button active">의뢰 이력</button>
-            <button class="tab-button">마이페이지</button>
-        </div>
 
         <!-- 통계 요약 -->
         <div class="stats-summary">
@@ -732,6 +765,22 @@
         -->
     </div>
 
+    <!-- 하단 탭바 -->
+    <nav class="bottom-tabs">
+        <button class="tab-item" onclick="switchTab('hospital-info')">
+            <div class="tab-icon">🏥</div>
+            <div class="tab-label">병원 관리</div>
+        </button>
+        <button class="tab-item active" onclick="switchTab('referral-history')">
+            <div class="tab-icon">📋</div>
+            <div class="tab-label">의뢰 이력</div>
+        </button>
+        <button class="tab-item" onclick="switchTab('mypage')">
+            <div class="tab-icon">👤</div>
+            <div class="tab-label">마이페이지</div>
+        </button>
+    </nav>
+
     <script>
         // 탭 전환 기능
         document.querySelectorAll('.tab-button').forEach(button => {
@@ -765,7 +814,7 @@
                 // 상세보기 버튼이 아닌 경우에만 카드 클릭 처리
                 if (!e.target.classList.contains('detail-btn')) {
                     // 상세 페이지로 이동
-                    console.log('의뢰서 상세 페이지로 이동');
+                    window.location.href = '../referral-detail/referral-detail.html';
                 }
             });
         });
@@ -774,8 +823,7 @@
         document.querySelectorAll('.detail-btn').forEach(button => {
             button.addEventListener('click', function(e) {
                 e.stopPropagation();
-                console.log('상세보기 클릭');
-                // 상세 페이지로 이동 로직
+                window.location.href = '../referral-detail/referral-detail.html';
             });
         });
 
@@ -787,6 +835,15 @@
 
         // 30초마다 통계 업데이트
         setInterval(updateStats, 30000);
+
+        // 탭 전환 기능
+        function switchTab(tabName) {
+            if (tabName === 'hospital-info') {
+                window.location.href = '../hospital-info/hospital-info.html';
+            } else if (tabName === 'mypage') {
+                window.location.href = '../mypage/mypage.html';
+            }
+        }
     </script>
 </body>
 </html>
