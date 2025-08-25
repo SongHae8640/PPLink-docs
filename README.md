@@ -1,4 +1,8 @@
-# 정신병원입원 의뢰 시스템
+# 정신병원입원 의뢰 시스템 (PPLink)
+
+## 🌐 데모 사이트
+
+**➡️ [PPLink 데모 사이트 바로가기](https://songhae8640.github.io/PPLink-docs/domains/index.html)**
 
 ## 📋 프로젝트 개요
 

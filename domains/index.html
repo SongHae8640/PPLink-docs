@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>정신병원입원 의뢰 시스템 - PPLink</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .logo {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1B365D;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #6B7280;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .role-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 20px;
+        }
+
+        .login-links {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .login-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #374151;
+            font-weight: 500;
+            font-size: 16px;
+            transition: all 0.2s;
+            background: #F9FAFB;
+        }
+
+        .login-btn:hover {
+            border-color: #6366F1;
+            background: #F0F9FF;
+            color: #1E40AF;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.15);
+        }
+
+        .login-btn .icon {
+            font-size: 24px;
+        }
+
+        .login-btn .content {
+            flex: 1;
+            text-align: left;
+            margin-left: 16px;
+        }
+
+        .login-btn .role {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .login-btn .desc {
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        .arrow {
+            color: #9CA3AF;
+            font-size: 18px;
+        }
+
+        .test-info {
+            background: #FEF3C7;
+            border: 1px solid #F59E0B;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 30px;
+        }
+
+        .test-info h3 {
+            color: #92400E;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .test-info p {
+            color: #78350F;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #E5E7EB;
+            color: #9CA3AF;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: #6366F1;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 30px 20px;
+                margin: 20px;
+            }
+
+            .title {
+                font-size: 24px;
+            }
+
+            .subtitle {
+                font-size: 16px;
+            }
+
+            .login-btn {
+                padding: 16px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🏥</div>
+        <h1 class="title">PPLink</h1>
+        <p class="subtitle">
+            정신과 응급환자 병원 입원 의뢰 시스템<br>
+            Police Psychiatric hospital Link System
+        </p>
+
+        <div class="role-section">
+            <h2 class="section-title">역할 선택</h2>
+            <div class="login-links">
+                <a href="police/auth-login/auth-login.html" class="login-btn">
+                    <div class="icon">👮‍♂️</div>
+                    <div class="content">
+                        <div class="role">경찰관</div>
+                        <div class="desc">병상현황 조회 및 입원 의뢰서 작성</div>
+                    </div>
+                    <div class="arrow">→</div>
+                </a>
+
+                <a href="hospital/auth-login/auth-login.html" class="login-btn">
+                    <div class="icon">👩‍⚕️</div>
+                    <div class="content">
+                        <div class="role">병원 직원</div>
+                        <div class="desc">의뢰서 검토 및 승인/거부 처리</div>
+                    </div>
+                    <div class="arrow">→</div>
+                </a>
+
+                <a href="#" class="login-btn" onclick="alert('관리자 기능은 준비 중입니다.')">
+                    <div class="icon">👨‍💼</div>
+                    <div class="content">
+                        <div class="role">관리자</div>
+                        <div class="desc">시스템 관리 및 사용자 승인</div>
+                    </div>
+                    <div class="arrow">→</div>
+                </a>
+            </div>
+        </div>
+
+        <div class="test-info">
+            <h3>🧪 테스트 계정 정보</h3>
+            <p>
+                <strong>아이디:</strong> demo<br>
+                <strong>비밀번호:</strong> demo<br>
+                <em>경찰관과 병원 직원 모두 동일한 계정으로 테스트 가능합니다.</em>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // 페이지 로드 시 애니메이션
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.querySelector('.container');
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                container.style.transition = 'all 0.6s ease';
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+</body>
+</html>
