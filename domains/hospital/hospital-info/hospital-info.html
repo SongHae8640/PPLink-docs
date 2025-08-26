@@ -159,27 +159,122 @@
             border: 2px solid #e5e7eb;
             border-radius: 12px;
             padding: 20px 16px;
-            text-align: center;
+            text-align: left;
             transition: all 0.2s;
         }
 
         .bed-type {
             font-size: 14px;
-            color: #6B7280;
+            color: #374151;
+            margin-bottom: 16px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .bed-info-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .bed-info-label {
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .bed-info-value {
             font-weight: 600;
         }
 
+        .bed-info-value.total {
+            color: #374151;
+        }
+
+        .bed-info-value.used {
+            color: #dc2626;
+        }
+
+        .bed-info-value.available {
+            color: #059669;
+        }
+
         .bed-count {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
             color: #1f2937;
-            margin-bottom: 4px;
+            margin-bottom: 12px;
+            padding: 8px;
+            background: white;
+            border-radius: 6px;
+            text-align: center;
         }
 
         .bed-available {
             font-size: 12px;
             color: #6B7280;
+        }
+
+        /* 병상 수정 모드 스타일 */
+        .bed-edit-item {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px 16px;
+            transition: all 0.2s;
+        }
+
+        .bed-edit-item .bed-type {
+            font-size: 14px;
+            color: #374151;
+            margin-bottom: 16px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .bed-edit-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .bed-input-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bed-input-label {
+            font-size: 13px;
+            color: #374151;
+            font-weight: 600;
+            min-width: 60px;
+        }
+
+        .bed-input {
+            width: 80px;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .bed-input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .bed-auto-calc {
+            font-size: 13px;
+            color: #059669;
+            font-weight: 600;
+            background: #dcfce7;
+            padding: 4px 8px;
+            border-radius: 4px;
         }
 
         /* 수정 버튼 */
@@ -636,8 +731,18 @@
                 return `
                     <div class="bed-status-item">
                         <div class="bed-type">${label}</div>
-                        <div class="bed-count">${bed.used}/${bed.total}</div>
-                        <div class="bed-available">${available}개 가용</div>
+                        <div class="bed-info-line">
+                            <span class="bed-info-label">총 병상</span>
+                            <span class="bed-info-value total">${bed.total}개</span>
+                        </div>
+                        <div class="bed-info-line">
+                            <span class="bed-info-label">입원중</span>
+                            <span class="bed-info-value used">${bed.used}개</span>
+                        </div>
+                        <div class="bed-info-line">
+                            <span class="bed-info-label">가용</span>
+                            <span class="bed-info-value available">${available}개</span>
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -679,19 +784,30 @@
             
             container.innerHTML = Object.entries(bedCategories).map(([key, label]) => {
                 const bed = hospitalData.beds[key];
+                const available = bed.total - bed.used;
                 
                 return `
                     <div class="bed-edit-item">
                         <div class="bed-type">${label}</div>
                         <div class="bed-edit-inputs">
-                            <input type="number" class="bed-input" placeholder="총 병상" 
-                                   value="${bed.total}" min="1" max="100" 
-                                   onchange="updateBedData('${key}', 'total', this.value)">
-                            <input type="number" class="bed-input" placeholder="사용 중" 
-                                   value="${bed.used}" min="0" 
-                                   onchange="updateBedData('${key}', 'used', this.value)">
-                            <div class="bed-available-calc" id="available-${key}">
-                                ${bed.total - bed.used}개 가용
+                            <div class="bed-input-group">
+                                <span class="bed-input-label">총 병상</span>
+                                <input type="number" class="bed-input" 
+                                       value="${bed.total}" min="1" max="100" 
+                                       onchange="updateBedData('${key}', 'total', this.value)">
+                                <span style="font-size: 12px; color: #6b7280;">개</span>
+                            </div>
+                            <div class="bed-input-group">
+                                <span class="bed-input-label">입원중</span>
+                                <input type="number" class="bed-input" 
+                                       value="${bed.used}" min="0" 
+                                       onchange="updateBedData('${key}', 'used', this.value)">
+                                <span style="font-size: 12px; color: #6b7280;">개</span>
+                            </div>
+                            <div class="bed-input-group">
+                                <span class="bed-input-label">가용</span>
+                                <span class="bed-auto-calc" id="available-${key}">${available}개</span>
+                                <span style="font-size: 11px; color: #9ca3af;">(자동계산)</span>
                             </div>
                         </div>
                     </div>
@@ -712,7 +828,7 @@
             
             // 가용 병상 재계산
             const available = hospitalData.beds[bedType].total - hospitalData.beds[bedType].used;
-            document.getElementById(`available-${bedType}`).textContent = `${available}개 가용`;
+            document.getElementById(`available-${bedType}`).textContent = `${available}개`;
         }
 
         // 전화번호 자동 하이픈 추가
