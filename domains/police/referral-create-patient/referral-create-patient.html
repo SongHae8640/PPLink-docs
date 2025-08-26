@@ -51,6 +51,25 @@
             background: #f3f4f6;
         }
 
+        .load-button {
+            background: none;
+            border: 1px solid #e5e7eb;
+            font-size: 14px;
+            color: #374151;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .load-button:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+
         .header-info {
             flex: 1;
         }
@@ -91,6 +110,28 @@
             margin-bottom: 16px;
             padding-bottom: 8px;
             border-bottom: 2px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .section-load-button {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            font-size: 13px;
+            color: #374151;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .section-load-button:hover {
+            background: #f1f5f9;
+            border-color: #d1d5db;
         }
 
         /* 폼 요소 */
@@ -342,6 +383,196 @@
             opacity: 1;
         }
 
+        /* 불러오기 모달 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 24px 24px 16px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .modal-description {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .filter-group {
+            margin-bottom: 24px;
+        }
+
+        .filter-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .referral-list {
+            margin-bottom: 24px;
+        }
+
+        .referral-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .referral-item:hover {
+            border-color: #2563eb;
+            background: #f8fafc;
+        }
+
+        .referral-item.selected {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .referral-item-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .patient-name {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .referral-date {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .referral-info {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .data-options {
+            margin-bottom: 24px;
+        }
+
+        .option-group {
+            margin-bottom: 12px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            margin-right: 8px;
+            accent-color: #2563eb;
+        }
+
+        .checkbox-label {
+            font-size: 14px;
+            color: #374151;
+            cursor: pointer;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            padding: 16px 24px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .btn-secondary {
+            background: #f9fafb;
+            color: #374151;
+            border: 1px solid #d1d5db;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: #f3f4f6;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-primary:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
         /* 반응형 */
         @media (max-width: 768px) {
             .main-container {
@@ -389,7 +620,12 @@
         <form id="requestForm">
             <!-- 환자 정보 섹션 -->
             <section class="form-section">
-                <h2 class="section-title">환자 정보</h2>
+                <h2 class="section-title">
+                    환자 정보
+                    <button type="button" class="section-load-button" onclick="openLoadModal()">
+                        📋 불러오기
+                    </button>
+                </h2>
                 
                 <div class="form-group">
                     <label class="form-label" for="patientName">
@@ -798,6 +1034,212 @@
             // 병원 선택 단계로 이동
             window.location.href = '../referral-create-hospital/referral-create-hospital.html';
         }
+    </script>
+
+    <!-- 불러오기 모달 -->
+    <div class="modal-overlay" id="loadModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">이전 의뢰서 불러오기</h2>
+                <p class="modal-description">이전에 작성한 의뢰서 정보를 가져와서 새로 작성할 수 있습니다</p>
+            </div>
+            
+            <div class="modal-body">
+                <!-- 의뢰서 목록 -->
+                <div class="filter-label">최근 1주일 의뢰서</div>
+                <div class="referral-list" id="referralList">
+                    <div class="referral-item" data-id="1" onclick="selectReferral(1)">
+                        <div class="referral-item-header">
+                            <div class="patient-name">김○○</div>
+                            <div class="referral-date">2024.01.20 15:30</div>
+                        </div>
+                        <div class="referral-info">응급환자 • 완료</div>
+                    </div>
+                    
+                    <div class="referral-item" data-id="2" onclick="selectReferral(2)">
+                        <div class="referral-item-header">
+                            <div class="patient-name">박○○</div>
+                            <div class="referral-date">2024.01.18 09:15</div>
+                        </div>
+                        <div class="referral-info">일반환자 • 종료</div>
+                    </div>
+
+                    <div class="referral-item" data-id="3" onclick="selectReferral(3)">
+                        <div class="referral-item-header">
+                            <div class="patient-name">이○○</div>
+                            <div class="referral-date">2024.01.15 14:22</div>
+                        </div>
+                        <div class="referral-info">중증환자 • 완료</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" onclick="closeLoadModal()">취소</button>
+                <button type="button" class="btn-primary" id="loadButton" onclick="loadReferralData()" disabled>불러오기</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedReferralId = null;
+
+        // 불러오기 모달 열기
+        function openLoadModal() {
+            document.getElementById('loadModal').classList.add('show');
+        }
+
+        // 불러오기 모달 닫기
+        function closeLoadModal() {
+            document.getElementById('loadModal').classList.remove('show');
+            selectedReferralId = null;
+            updateLoadButton();
+            // 선택 상태 초기화
+            document.querySelectorAll('.referral-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+        }
+
+        // 의뢰서 선택
+        function selectReferral(id) {
+            // 기존 선택 해제
+            document.querySelectorAll('.referral-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // 새 선택
+            document.querySelector(`[data-id="${id}"]`).classList.add('selected');
+            selectedReferralId = id;
+            updateLoadButton();
+        }
+
+        // 불러오기 버튼 상태 업데이트
+        function updateLoadButton() {
+            const loadButton = document.getElementById('loadButton');
+            loadButton.disabled = !selectedReferralId;
+        }
+
+        // 의뢰서 데이터 불러오기
+        function loadReferralData() {
+            if (!selectedReferralId) return;
+
+            // 기존 데이터가 있으면 덮어쓰기 확인
+            const hasExistingData = checkExistingData();
+            if (hasExistingData) {
+                if (!confirm('기존에 입력한 내용이 있습니다. 불러온 정보로 덮어쓰시겠습니까?')) {
+                    return;
+                }
+            }
+
+            // 샘플 데이터 (실제로는 API에서 가져옴)
+            const sampleData = getSampleReferralData(selectedReferralId);
+            
+            // 폼에 모든 데이터 적용
+            if (sampleData.patientInfo) {
+                document.getElementById('patientName').value = sampleData.patientInfo.name || '';
+                if (sampleData.patientInfo.gender) {
+                    document.querySelector(`input[name="gender"][value="${sampleData.patientInfo.gender}"]`).checked = true;
+                }
+                document.getElementById('birthDate').value = sampleData.patientInfo.birthDate || '';
+                document.getElementById('patientType').value = sampleData.patientInfo.category || '';
+                document.getElementById('height').value = sampleData.patientInfo.height || '';
+                document.getElementById('weight').value = sampleData.patientInfo.weight || '';
+            }
+
+            if (sampleData.guardianInfo) {
+                document.getElementById('guardianName').value = sampleData.guardianInfo.name || '';
+                document.getElementById('relationship').value = sampleData.guardianInfo.relation || '';
+                document.getElementById('guardianPhone').value = sampleData.guardianInfo.phone || '';
+            }
+
+            if (sampleData.additionalInfo) {
+                document.getElementById('notes').value = sampleData.additionalInfo.notes || '';
+            }
+
+            // 모달 닫기
+            closeLoadModal();
+            
+            // 성공 메시지 표시
+            showAutoSaveIndicator('이전 의뢰서 정보를 불러왔습니다', 'success');
+        }
+
+        // 기존 데이터 존재 여부 확인
+        function checkExistingData() {
+            const inputs = ['patientName', 'birthDate', 'guardianName', 'guardianPhone', 'notes'];
+            return inputs.some(id => {
+                const element = document.getElementById(id);
+                return element && element.value.trim() !== '';
+            });
+        }
+
+        // 샘플 데이터 생성 (실제로는 API 호출)
+        function getSampleReferralData(id) {
+            const sampleData = {
+                1: {
+                    patientInfo: {
+                        name: '김민수',
+                        gender: 'male',
+                        birthDate: '1985-03-15',
+                        category: 'adult-male',
+                        height: '175',
+                        weight: '70'
+                    },
+                    guardianInfo: {
+                        name: '김영희',
+                        relation: 'spouse',
+                        phone: '010-1234-5678'
+                    },
+                    additionalInfo: {
+                        notes: '과도한 흥분 상태, 자해 위험성 있음'
+                    }
+                },
+                2: {
+                    patientInfo: {
+                        name: '박철수',
+                        gender: 'male',
+                        birthDate: '1992-07-22',
+                        category: 'adult-male',
+                        height: '180',
+                        weight: '75'
+                    },
+                    guardianInfo: {
+                        name: '박순자',
+                        relation: 'parent',
+                        phone: '010-9876-5432'
+                    },
+                    additionalInfo: {
+                        notes: '알코올 관련 정신장애 의심'
+                    }
+                },
+                3: {
+                    patientInfo: {
+                        name: '이영수',
+                        gender: 'male',
+                        birthDate: '1978-12-05',
+                        category: 'adult-male',
+                        height: '168',
+                        weight: '65'
+                    },
+                    guardianInfo: {
+                        name: '이미영',
+                        relation: 'sibling',
+                        phone: '010-5555-7777'
+                    },
+                    additionalInfo: {
+                        notes: '조현병 기왕력, 약물 복용 중단으로 인한 악화'
+                    }
+                }
+            };
+            
+            return sampleData[id] || {};
+        }
+
+        // 모달 외부 클릭 시 닫기
+        document.getElementById('loadModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeLoadModal();
+            }
+        });
     </script>
 </body>
 </html>
