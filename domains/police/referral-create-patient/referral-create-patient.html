@@ -255,6 +255,14 @@
             color: #9CA3AF;
         }
 
+        .upload-description {
+            font-size: 12px;
+            color: #4B5563;
+            margin-top: 8px;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
         .photo-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -761,6 +769,11 @@
                     <div class="upload-icon">📷</div>
                     <div class="upload-text">사진 추가</div>
                     <div class="upload-limit">최대 10장 (JPG, PNG, HEIC)</div>
+                    <div class="upload-description">
+                        공무원증 (신분 확인)<br>
+                        현장 사진 (상황 증명)<br>
+                        응급입원 대상자의 자해 상흔 등
+                    </div>
                 </div>
 
                 <input type="file" id="photoInput" multiple accept="image/*" style="display: none;">
