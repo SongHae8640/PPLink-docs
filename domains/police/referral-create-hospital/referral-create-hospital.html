@@ -883,7 +883,33 @@
         }
 
         function checkRequest() {
-            alert('의뢰서 확인 (실제로는 미리보기 모달 표시)');
+            showReferralModal();
+        }
+
+        function showReferralModal() {
+            const modal = document.createElement('div');
+            modal.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center;" onclick="closeModal(event)">
+                    <div style="background: white; border-radius: 12px; max-width: 90vw; max-height: 90vh; overflow: auto; position: relative;" onclick="event.stopPropagation()">
+                        <div style="position: sticky; top: 0; background: white; padding: 16px 20px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; border-radius: 12px 12px 0 0;">
+                            <h3 style="font-size: 18px; font-weight: 600; color: #1f2937;">의뢰서 확인</h3>
+                            <button onclick="closeModal()" style="background: none; border: none; font-size: 24px; color: #6b7280; cursor: pointer; padding: 4px;">×</button>
+                        </div>
+                        <div style="padding: 20px;">
+                            <img src="referral_sample.png" alt="의뢰서" style="width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function closeModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            const modal = document.querySelector('div[style*="position: fixed"]');
+            if (modal) {
+                modal.remove();
+            }
         }
 
         function sendToSelected() {
