@@ -127,68 +127,58 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
-        .filter-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 16px;
+        .filter-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 16px;
         }
 
-        .filter-toggle {
+        .filter-tabs {
             display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .toggle-switch {
-            position: relative;
-            width: 48px;
-            height: 24px;
-            background: #e5e7eb;
+            background: #f1f5f9;
             border-radius: 12px;
-            cursor: pointer;
-            transition: background-color 0.2s;
+            padding: 4px;
+            gap: 4px;
         }
 
-        .toggle-switch.active {
-            background: #2563EB;
-        }
-
-        .toggle-handle {
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 20px;
-            height: 20px;
-            background: white;
-            border-radius: 50%;
-            transition: transform 0.2s;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-        }
-
-        .toggle-switch.active .toggle-handle {
-            transform: translateX(24px);
-        }
-
-        .filter-label {
+        .filter-tab {
+            flex: 1;
+            padding: 12px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
             font-size: 14px;
             font-weight: 500;
-            color: #374151;
-        }
-
-        .sort-select {
-            padding: 8px 12px;
-            border: 2px solid #e5e7eb;
-            border-radius: 6px;
-            font-size: 14px;
-            background: white;
+            color: #64748b;
             cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
         }
 
-        .sort-select:focus {
-            outline: none;
-            border-color: #2563EB;
+        .filter-tab:hover {
+            color: #334155;
+            background: rgba(255, 255, 255, 0.5);
         }
+
+        .filter-tab.active {
+            background: white;
+            color: #2563EB;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            font-weight: 600;
+        }
+
+        .filter-description {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 2px;
+            font-weight: 400;
+        }
+
+        .filter-tab.active .filter-description {
+            color: #6366f1;
+        }
+
 
         /* 선택 요약 */
         .selection-summary {
@@ -492,11 +482,6 @@
                 padding: 12px;
             }
 
-            .filter-row {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 12px;
-            }
 
             .selection-summary {
                 flex-direction: column;
@@ -565,21 +550,22 @@
             </div>
         </section>
 
-        <!-- 필터 및 정렬 -->
+        <!-- 필터 영역 -->
         <section class="filter-section">
-            <div class="filter-row">
-                <div class="filter-toggle">
-                    <div class="toggle-switch" id="nightToggle">
-                        <div class="toggle-handle"></div>
-                    </div>
-                    <label class="filter-label">야간병원만 표시 (현재 시간 기준)</label>
-                </div>
-                
-                <select class="sort-select" id="sortSelect" onchange="sortHospitals()">
-                    <option value="beds">가용 병상 많은 순</option>
-                    <option value="distance">거리 가까운 순</option>
-                    <option value="name">이름순</option>
-                </select>
+            <div class="filter-title">진료시간 필터</div>
+            <div class="filter-tabs">
+                <button class="filter-tab" id="tab-day" onclick="setTimeFilter('day')">
+                    <span>주간만</span>
+                    <span class="filter-description">09시~18시</span>
+                </button>
+                <button class="filter-tab active" id="tab-all" onclick="setTimeFilter('all')">
+                    <span>전체</span>
+                    <span class="filter-description">모든 병원</span>
+                </button>
+                <button class="filter-tab" id="tab-night" onclick="setTimeFilter('night')">
+                    <span>야간만</span>
+                    <span class="filter-description">18시~09시</span>
+                </button>
             </div>
         </section>
 
@@ -700,14 +686,13 @@
             type: "adult-male" // adult-male, adult-female, youth-male, youth-female, other
         };
 
-        let isNightFilter = false;
+        let currentTimeFilter = 'all';
         let currentData = hospitalData;
         let selectedHospitals = new Set();
 
         // 초기화
         document.addEventListener('DOMContentLoaded', function() {
             checkNightTime();
-            setupToggle();
             renderHospitalList();
             updatePatientSummary();
         });
@@ -717,7 +702,9 @@
             const now = new Date();
             const hour = now.getHours();
             if (hour >= 18 || hour < 9) {
-                toggleNightFilter(true);
+                setTimeFilter('night');
+            } else {
+                setTimeFilter('all');
             }
         }
 
@@ -727,49 +714,34 @@
             summary.textContent = `${patientInfo.name} (${patientInfo.gender}, ${patientInfo.age}세) - ${bedCategories[patientInfo.type]}`;
         }
 
-        // 토글 설정
-        function setupToggle() {
-            const toggle = document.getElementById('nightToggle');
-            toggle.addEventListener('click', function() {
-                toggleNightFilter(!isNightFilter);
+        // 시간 필터 설정
+        function setTimeFilter(filterType) {
+            currentTimeFilter = filterType;
+            
+            // 탭 UI 업데이트
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('active');
             });
-        }
-
-        // 야간 필터 토글
-        function toggleNightFilter(active) {
-            isNightFilter = active;
-            const toggle = document.getElementById('nightToggle');
+            document.getElementById(`tab-${filterType}`).classList.add('active');
             
-            if (active) {
-                toggle.classList.add('active');
-                currentData = hospitalData.filter(hospital => hospital.nightAvailable);
-            } else {
-                toggle.classList.remove('active');
-                currentData = hospitalData;
-            }
-            
-            sortHospitals();
-        }
-
-        // 병원 정렬
-        function sortHospitals() {
-            const sortBy = document.getElementById('sortSelect').value;
-            
-            switch(sortBy) {
-                case 'beds':
-                    currentData.sort((a, b) => {
-                        const aAvailable = a.beds[patientInfo.type].total - a.beds[patientInfo.type].used;
-                        const bAvailable = b.beds[patientInfo.type].total - b.beds[patientInfo.type].used;
-                        return bAvailable - aAvailable;
-                    });
+            // 데이터 필터링
+            switch(filterType) {
+                case 'day':
+                    currentData = hospitalData.filter(hospital => !hospital.nightAvailable);
                     break;
-                case 'distance':
-                    currentData.sort((a, b) => a.distance - b.distance);
+                case 'night':
+                    currentData = hospitalData.filter(hospital => hospital.nightAvailable);
                     break;
-                case 'name':
-                    currentData.sort((a, b) => a.name.localeCompare(b.name));
+                case 'all':
+                default:
+                    currentData = hospitalData;
                     break;
             }
+            
+            // 선택된 병원 중 필터에 해당하지 않는 병원들 제거
+            selectedHospitals = new Set([...selectedHospitals].filter(id => 
+                currentData.some(hospital => hospital.id === id)
+            ));
             
             renderHospitalList();
         }
@@ -787,10 +759,21 @@
             const container = document.getElementById('hospitalList');
             
             if (currentData.length === 0) {
+                let emptyMessage;
+                switch(currentTimeFilter) {
+                    case 'day':
+                        emptyMessage = '주간만 진료 가능한 병원이 없습니다.';
+                        break;
+                    case 'night':
+                        emptyMessage = '야간 진료 가능한 병원이 없습니다.';
+                        break;
+                    default:
+                        emptyMessage = '조건에 맞는 병원이 없습니다.';
+                }
                 container.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">🏥</div>
-                        <p>조건에 맞는 병원이 없습니다.</p>
+                        <p>${emptyMessage}</p>
                     </div>
                 `;
                 return;

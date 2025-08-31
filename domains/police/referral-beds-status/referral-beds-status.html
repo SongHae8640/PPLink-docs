@@ -90,46 +90,56 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
-        .filter-toggle {
+        .filter-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 16px;
+        }
+
+        .filter-tabs {
             display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .toggle-switch {
-            position: relative;
-            width: 48px;
-            height: 24px;
-            background: #e5e7eb;
+            background: #f1f5f9;
             border-radius: 12px;
-            cursor: pointer;
-            transition: background-color 0.2s;
+            padding: 4px;
+            gap: 4px;
         }
 
-        .toggle-switch.active {
-            background: #2563EB;
-        }
-
-        .toggle-handle {
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 20px;
-            height: 20px;
-            background: white;
-            border-radius: 50%;
-            transition: transform 0.2s;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-        }
-
-        .toggle-switch.active .toggle-handle {
-            transform: translateX(24px);
-        }
-
-        .filter-label {
+        .filter-tab {
+            flex: 1;
+            padding: 12px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
             font-size: 14px;
             font-weight: 500;
-            color: #374151;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .filter-tab:hover {
+            color: #334155;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .filter-tab.active {
+            background: white;
+            color: #2563EB;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            font-weight: 600;
+        }
+
+        .filter-description {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 2px;
+            font-weight: 400;
+        }
+
+        .filter-tab.active .filter-description {
+            color: #6366f1;
         }
 
         /* 병원 목록 */
@@ -456,11 +466,20 @@
     <main class="main-container">
         <!-- 필터 영역 -->
         <section class="filter-section">
-            <div class="filter-toggle">
-                <div class="toggle-switch" id="nightToggle">
-                    <div class="toggle-handle"></div>
-                </div>
-                <label class="filter-label">야간병원만 표시 (18시~09시)</label>
+            <div class="filter-title">진료시간 필터</div>
+            <div class="filter-tabs">
+                <button class="filter-tab" id="tab-day" onclick="setTimeFilter('day')">
+                    <span>주간만</span>
+                    <span class="filter-description">09시~18시</span>
+                </button>
+                <button class="filter-tab active" id="tab-all" onclick="setTimeFilter('all')">
+                    <span>전체</span>
+                    <span class="filter-description">모든 병원</span>
+                </button>
+                <button class="filter-tab" id="tab-night" onclick="setTimeFilter('night')">
+                    <span>야간만</span>
+                    <span class="filter-description">18시~09시</span>
+                </button>
             </div>
         </section>
 
@@ -570,14 +589,13 @@
             }
         ];
 
-        let isNightFilter = false;
+        let currentTimeFilter = 'all'; // 'all', 'day', 'night'
         let currentData = hospitalData;
 
         // 초기화
         document.addEventListener('DOMContentLoaded', function() {
             checkNightTime();
             renderHospitalList();
-            setupToggle();
         });
 
         // 야간시간 체크 (18시-09시)
@@ -585,29 +603,34 @@
             const now = new Date();
             const hour = now.getHours();
             if (hour >= 18 || hour < 9) {
-                toggleNightFilter(true);
+                setTimeFilter('night');
+            } else {
+                setTimeFilter('all');
             }
         }
 
-        // 토글 설정
-        function setupToggle() {
-            const toggle = document.getElementById('nightToggle');
-            toggle.addEventListener('click', function() {
-                toggleNightFilter(!isNightFilter);
-            });
-        }
-
-        // 야간 필터 토글
-        function toggleNightFilter(active) {
-            isNightFilter = active;
-            const toggle = document.getElementById('nightToggle');
+        // 시간 필터 설정
+        function setTimeFilter(filterType) {
+            currentTimeFilter = filterType;
             
-            if (active) {
-                toggle.classList.add('active');
-                currentData = hospitalData.filter(hospital => hospital.nightAvailable);
-            } else {
-                toggle.classList.remove('active');
-                currentData = hospitalData;
+            // 탭 UI 업데이트
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(`tab-${filterType}`).classList.add('active');
+            
+            // 데이터 필터링
+            switch(filterType) {
+                case 'day':
+                    currentData = hospitalData.filter(hospital => !hospital.nightAvailable);
+                    break;
+                case 'night':
+                    currentData = hospitalData.filter(hospital => hospital.nightAvailable);
+                    break;
+                case 'all':
+                default:
+                    currentData = hospitalData;
+                    break;
             }
             
             renderHospitalList();
@@ -626,10 +649,21 @@
             const container = document.getElementById('hospitalList');
             
             if (currentData.length === 0) {
+                let emptyMessage;
+                switch(currentTimeFilter) {
+                    case 'day':
+                        emptyMessage = '주간만 진료 가능한 병원이 없습니다.';
+                        break;
+                    case 'night':
+                        emptyMessage = '야간 진료 가능한 병원이 없습니다.';
+                        break;
+                    default:
+                        emptyMessage = '병원 정보를 불러올 수 없습니다.';
+                }
                 container.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">🏥</div>
-                        <p>야간 진료 가능한 병원이 없습니다.</p>
+                        <p>${emptyMessage}</p>
                     </div>
                 `;
                 return;
