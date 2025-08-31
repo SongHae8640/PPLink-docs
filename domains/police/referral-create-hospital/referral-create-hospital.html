@@ -924,7 +924,7 @@
             
             if (confirm(`선택한 ${selectedHospitals.size}개 병원에 의뢰서를 전송하시겠습니까?\n\n${selectedNames.join('\n')}`)) {
                 alert('선택된 병원에 의뢰서가 전송되었습니다.');
-                // 실제로는 결과 페이지로 이동
+                window.location.href = '../referral-history/referral-history.html';
             }
         }
 
@@ -932,7 +932,7 @@
             const count = currentData.length;
             if (confirm(`현재 표시된 모든 병원(${count}개)에 의뢰서를 전송하시겠습니까?`)) {
                 alert('모든 병원에 의뢰서가 전송되었습니다.');
-                // 실제로는 결과 페이지로 이동
+                window.location.href = '../referral-history/referral-history.html';
             }
         }
 
